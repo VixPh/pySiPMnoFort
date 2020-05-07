@@ -1,0 +1,11 @@
+size = 1
+cellsize = 25
+dcr = 100e3
+xt = 0.01
+ap = 0.03
+SNR = 30
+ccgv = 0.05
+
+intstart = 20
+intgate = 300
+preg = 20

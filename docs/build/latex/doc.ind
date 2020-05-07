@@ -1,0 +1,34 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter A
+  \item \spxentry{addDCR()}\spxextra{in module libs.lib}, \hyperpage{7}
+
+  \indexspace
+  \bigletter E
+  \item \spxentry{evtsGen()}\spxextra{in module libs.lib}, \hyperpage{7}
+
+  \indexspace
+  \bigletter I
+  \item \spxentry{initializeRandomPool()}\spxextra{in module libs.lib}, \hyperpage{8}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{PulseCPU()}\spxextra{in module libs.lib}, \hyperpage{7}
+  \item \spxentry{PulseCPU()}\spxextra{in module libs.libCPU}, \hyperpage{8}
+  \item \spxentry{PulseCPU()}\spxextra{in module libs.libGPU}, \hyperpage{9}
+  \item \spxentry{PulseGPU()}\spxextra{in module libs.libGPU}, \hyperpage{9}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{signalGen()}\spxextra{in module libs.lib}, \hyperpage{7}
+  \item \spxentry{signalGen()}\spxextra{in module libs.libCPU}, \hyperpage{8}
+  \item \spxentry{signalGen()}\spxextra{in module libs.libGPU}, \hyperpage{9}
+  \item \spxentry{sigPlot()}\spxextra{in module libs.lib}, \hyperpage{7}
+  \item \spxentry{SiPM()}\spxextra{in module main}, \hyperpage{5}
+  \item \spxentry{somestats()}\spxextra{in module libs.lib}, \hyperpage{8}
+
+\end{sphinxtheindex}

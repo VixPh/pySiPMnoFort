@@ -1,0 +1,22 @@
+siglen = 1000
+sampling = 0.1
+
+size = 1
+cellsize = 25
+dcr = 200e3
+xt = 0.10
+ap = 0.02
+tfall = 50
+trise = 1
+cellrecovery = 20
+tauapfast = 15
+tauapslow = 85
+intstart = 20
+intgate = 300
+preg = 20
+SNR = 30
+basespread = 0.00
+ccgv = 0.05
+
+fastDCR = False
+fastXT = False
