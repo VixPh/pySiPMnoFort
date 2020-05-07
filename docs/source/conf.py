@@ -40,6 +40,7 @@ extensions = ['sphinx_rtd_theme','sphinx.ext.autodoc', 'sphinx.ext.doctest',
 
 # Settings
 numfig = True
+html_show_sphinx = False
 html_theme = "sphinx_rtd_theme"
 html_logo = "logo.png"
 html_theme_options = {
