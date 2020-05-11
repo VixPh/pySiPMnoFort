@@ -17,7 +17,7 @@ def PulseGPU(t,h):
 	"""
 	PulseCPU(t,h)
 
-	Function that generates the signal from all SiPM cells at once. This is the "full" version that computes the signal shape on GPU
+	Function that generates the signal from all SiPM cells at once. This is the "full" version that computes the signal shape on GPU.
 
 	Parameters
 	----------
@@ -55,7 +55,7 @@ def PulseCPU(t,h):
 	"""
 	PulseCPU(t,h)
 
-	Function that generates the signal from a single SiPM cell. This is the "full" version that computes the signal shape on CPU
+	Function that generates the signal from a single SiPM cell. This is the "full" version that computes the signal shape on CPU by evaluating the signal shape function.
 
 	Parameters
 	----------
@@ -80,11 +80,12 @@ def PulseCPU(t,h):
 			s += signalgenfortran(tap,hap,tfall,trise,sigpts,gainvar)
 	return(s)
 
-def signalGen(times,sigH,SNR,basespread):												# Function that passes signals times and height to main function for generating signals
+def SiPMSignalAction(times,sigH,SNR,basespread):												# Function that passes signals times and height to main function for generating signals
 	"""
 	signalGen(times,sigH,SNR,basespread)
 
 	Function that passes signal height and times to the main function that generates signals. Also adds noise.
+	If the number of signals to generate is small uses CPU, else uses GPU to speed up the computation.
 
 	Parameters
 	----------

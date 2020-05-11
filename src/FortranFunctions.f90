@@ -7,9 +7,8 @@ subroutine signalgenfortran(s,t,h,tf,tr,sigpts,gvar)
 ! f2py intent(in) t,sigpts,h,gvar,tf,tr
 ! f2py intent(out),depend(sigpts) s
   s = 0
-  do i=t,min(sigpts,int(t+10*tf))
+  forall (i=t:min(sigpts,int(t+10*tf))) &
     s(i) = (exp((t-i)/tf)-exp((t-i)/tr))
-  end do
   s = gvar*h*s
 end subroutine
 

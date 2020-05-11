@@ -36,11 +36,11 @@ def SiPM(times,other):
 	dcrTime = addDCR(dcr)									#Generate DCR events (times)
 	if dcrTime.size:
 		times = hstack((times,dcrTime))						# Concatenate DCR events with photoelectrons events
-		sigTimes,sigH = evtsGen(times,xt)						# Update list of times considering SiPM matrix occupancy and recovery times
+		sigTimes,sigH = SiPMEventAction(times,xt)			# Update list of times considering SiPM matrix occupancy and recovery times
 	else:
-		sigTimes,sigH = evtsGen(times,xt)						# Update list of times considering SiPM matrix occupancy and recovery times
+		sigTimes,sigH = SiPMEventAction(times,xt)			# Update list of times considering SiPM matrix occupancy and recovery times
 
-	signal = signalGen(sigTimes,sigH,SNR,basespread)		# Generate digital signals
+	signal = SiPMSignalAction(sigTimes,sigH,SNR,basespread)	# Generate digital signals
 
 	signalInGate = signal[intstart:intstart+intgate]		# Select signal in the integration gate
 	integral = signalInGate.sum()*sampling					# Calculating integrals

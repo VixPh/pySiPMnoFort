@@ -1,9 +1,10 @@
 *.root
 /__pycache__
-/libs/__pycache
+/libs/__pycache__
 *.txt ! files/
 *.so
 /docs/make.bat
 /docs/Makefile
 /docs/source/
 /docs/build/doctrees/
+*.pyc

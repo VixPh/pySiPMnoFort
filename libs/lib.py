@@ -35,7 +35,7 @@ def addDCR(rate):											# Generate dcr times
 	return(dcrTime)
 
 ###FUNCTION TO UPDATE THE SIPM MATRIX ARRAY###
-def evtsGen(time,xt):
+def SiPMEventAction(time,xt):
 	"""
 	evtsGen(time,xt)
 
@@ -115,7 +115,7 @@ if args.signal is None:											# If generating signals fast (default)
 	x = np.arange(0,sigpts)
 	signalmodel = signalgenfortran(x,1,tfall,trise,sigpts,1)	# Define the model of my signal (calculate it only once)
 
-	def signalGen(times,sigH,SNR,basespread):							# Function that passes signals times and height to main function for generating signals
+	def SiPMSignalAction(times,sigH,SNR,basespread):							# Function that passes signals times and height to main function for generating signals
 		"""
 		signalGen(times,sigH,SNR,basespread)
 
@@ -246,7 +246,7 @@ def somestats(output):
 	input('Press <RET> to continue...')
 	return
 
-drawn = [False]*4#nJobs
+drawn = [False]*nJobs
 def sigPlot(signal,sigTimes,dcrTime,dev):
 	"""
 	sigPlot(signal,sigTimes,dcrTime,dev)

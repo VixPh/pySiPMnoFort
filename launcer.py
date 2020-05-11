@@ -1,6 +1,6 @@
 from main import *
 
-f = open('event.txt','r')
+# f = open('event.txt','r')
 eventID = []
 fiberID = []
 theta = []
@@ -15,12 +15,12 @@ times = []
 #     ti = np.asarray(ls[3:]).astype('float32')
 #     times.append(ti)
 
-pool = Pool(processes = nJobs ,initializer = initializeRandomPool)
+pool = Pool(processes = nJobs, initializer = initializeRandomPool)
 t = time.time()
 nEvt= 50000
 for i in range(nEvt):
     #SiPM(np.array([30]*25),())
-    times = np.ones(np.random.poisson(200))*25
+    times = np.ones(np.random.poisson(10))*30
     # other = np.asarray((eventID[i],fiberID[i],theta[i],phi[i]))
     pool.apply_async(SiPM,args=(times,()),callback=Callback)
 pool.close()
