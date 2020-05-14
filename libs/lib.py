@@ -201,52 +201,74 @@ def somestats(output):
 	integral = output[:,0]
 	peak = output[:,1]
 	tstart = output[:,2]
-	other = output[:,3]
+	tovert = output[:,3]
+	tpeak = output[:,4]
+	other = output[:,5]
 
+	ROOT.gROOT.SetStyle("ATLAS")
 	ROOT.gStyle.SetOptStat(1)
 	ROOT.gStyle.SetOptFit(1)
-	ROOT.gStyle.SetTitleXSize(0.05)
-	ROOT.gStyle.SetTitleYSize(0.05)
-	ROOT.gStyle.SetTitleXOffset(0.8)
-	ROOT.gStyle.SetTitleYOffset(0.05)
+	ROOT.gStyle.SetHistFillColor(603)
 	c1 = ROOT.TCanvas('c1','Histogram',600,400)
 	c2 = ROOT.TCanvas('c2','Histogram',600,400)
 	c3 = ROOT.TCanvas('c3','Histogram',600,400)
 	c4 = ROOT.TCanvas('c4','Histogram',600,400)
 	c5 = ROOT.TCanvas('c5','Cumulatives',600,400)
+	c6 = ROOT.TCanvas('c6','Histogram',600,400)
+	c7 = ROOT.TCanvas('c7','Histogram',600,400)
 
-	h1 = ROOT.TH1F('Integral','Integrals',750,-10,max(integral))
-	h1.SetXTitle('Integral')
-	h2 = ROOT.TH1F('Peak Value','Peaks',750,-0.25,max(peak))
-	h2.SetXTitle('Peak')
-	nbin = (np.max(tstart[tstart>0])-np.min(tstart[tstart>0])+0.5)/sampling
-	h3 = ROOT.TH1F('Starting Time','Tstart',int(nbin),min(tstart[tstart>0]),max(tstart[tstart>0]))
-	h3.SetXTitle('Time [ns]')
-	h4 = ROOT.TH2F('Histogram','PvsI',300,min(peak),max(peak),300,min(integral),max(integral))
+
+
+	h1 = ROOT.TH1F('Integral','Integral',750,integral.min(),integral.max())
+	h1.SetXTitle('Integral [A.U.]')
+	h1.SetYTitle('Entries')
+	h2 = ROOT.TH1F('Peak Value','Peak',750,peak.min(),peak.max())
+	h2.SetXTitle('Peak [A.U.]')
+	h2.SetYTitle('Entries')
+	h3 = ROOT.TH1F('Starting Time','Tstart',intgate,tstart.min()-1,tstart.max())
+	h3.SetXTitle('Starting Time [ns]')
+	h4 = ROOT.TH2F('Histogram','Peak - Integral',200,min(peak),max(peak),200,min(integral),max(integral))
+	h4.SetXTitle('Peak [A.U.]')
+	h4.SetYTitle('Integral [A.U.]')
+	h5 = ROOT.TH1F('ToT','Time over threshld',intgate,0,tovert.max())
+	h5.SetXTitle('Time [ns]')
+	h5.SetYTitle('Entries')
+	h6 = ROOT.TH1F('ToP','Time of peak',intgate,0,tpeak.max())
+	h6.SetXTitle('Time [ns]')
+	h6.SetYTitle('Entries')
 	[h1.Fill(i) for i in integral]
 	[h2.Fill(i) for i in peak]
 	[h3.Fill(i) for i in tstart]
 	[h4.Fill(i,j) for i,j in zip(peak,integral)]
+	[h5.Fill(i) for i in tovert]
+	[h6.Fill(i) for i in tpeak]
 	c1.cd()
-	h1.Draw("C PLC")
+	h1.Draw("bar9")
 	c2.cd()
-	h2.Draw("C PLC")
+	h2.Draw("bar9")
 	c3.cd()
-	h3.Draw("E")
+	h3.Draw("E9")
 	c4.cd()
-	h4.Draw("cont4z")
+	h4.Draw("colz")
 	c5.cd()
-	h1_C = h1.GetCumulative(True,' Cumulative')
-	h2_C = h2.GetCumulative(True,' Cumulative')
-	h1_C.SetLineColor(2)
-	h1_C.SetTitle('Cumulative histogram of integral')
-	h1_C.Draw("C")
-
-	c1.Update();c2.Update();c3.Update();c4.Update();c5.Update()
+	c5.SetLogy()
+	staircase = h2.GetCumulative(False,' Cumulative')
+	staircase.Scale(1e-3/h2.Integral()/(intgate*sampling*1e-9))
+	staircase.SetLineColor(2)
+	staircase.SetTitle('Staircase')
+	staircase.SetXTitle('Peak [A.U.]')
+	staircase.SetYTitle('Rate [kHz]')
+	staircase.SetFillColor(0)
+	staircase.Draw("hist9")
+	c6.cd()
+	h5.Draw("bar9")
+	c7.cd()
+	h6.Draw("bar9")
+	c1.Update();c2.Update();c3.Update();c4.Update();c5.Update();c6.Update();c7.Update()
 	input('Press <RET> to continue...')
 	return
 
-drawn = [False]*0#nJobs
+drawn = [False]*nJobs
 def sigPlot(signal,sigTimes,dcrTime,dev):
 	"""
 	sigPlot(signal,sigTimes,dcrTime,dev)
@@ -321,7 +343,9 @@ def SaveFile(fname,output):
 	integral = output[:,0]
 	peak = output[:,1]
 	tstart = output[:,2]
-	other = np.vstack(output[:,3])
+	tover = output[:,3]
+	ptime = output[:,4]
+	other = np.vstack(output[:,5])
 
 	event = other[:,0]
 	fiber = other[:,1]
@@ -329,12 +353,14 @@ def SaveFile(fname,output):
 	phi = other[:,3]
 
 	f = uproot.recreate(fname)
-	f['SiPMData'] = uproot.newtree({'Integral':'float32','Peak':'float32','ToA':'int32'})
+	f['SiPMData'] = uproot.newtree({'Integral':'float32','Peak':'float32','ToA':'float32','ToT':'float32','ToP':'float32'})
 	f['GeometryData'] = uproot.newtree({'EventId':'int32','FiberId':'int32','FiberTheta':'float32','FiberPhi':'float32'})
 
 	f['SiPMData']['Integral'].newbasket(integral)
 	f['SiPMData']['Peak'].newbasket(peak)
 	f['SiPMData']['ToA'].newbasket(tstart)
+	f['SiPMData']['ToP'].newbasket(ptime)
+	f['SiPMData']['ToT'].newbasket(tover)
 
 	f['GeometryData']['EventId'].newbasket(event)
 	f['GeometryData']['FiberId'].newbasket(fiber)

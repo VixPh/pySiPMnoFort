@@ -1,4 +1,4 @@
-import platform, importlib, gc
+import platform, importlib
 version = platform.python_version()
 implementation = platform.python_implementation()
 compiler = platform.python_compiler()
@@ -7,13 +7,13 @@ cur_system = platform.uname()
 nversion = 'Not Installed'
 cpversion = 'Not Installed'
 rootversion = 'Not Installed'
-if importlib.find_loader('numba') is not None:
+if importlib.util.find_spec('numba').loader is not None:
   import numba
   nversion = numba.__version__
-if importlib.find_loader('cupy') is not None:
+if importlib.util.find_spec('cupy').loader is not None:
   import cupy
   cpversion = cupy.__version__
-if importlib.find_loader('ROOT') is not None:
+if importlib.util.find_spec('ROOT').loader is not None:
   from ROOT import gROOT
   rootversion = gROOT.GetVersion()
 

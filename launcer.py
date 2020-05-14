@@ -17,10 +17,10 @@ times = []
 
 pool = Pool(processes = nJobs, initializer = initializeRandomPool)
 t = time.time()
-nEvt= 50000
+nEvt= 5000
 for i in range(nEvt):
     #SiPM(np.array([30]*25),())
-    times = np.ones(np.random.poisson(10))*30
+    times = np.ones(np.random.poisson(0))*30
     # other = np.asarray((eventID[i],fiberID[i],theta[i],phi[i]))
     pool.apply_async(SiPM,args=(times,()),callback=Callback)
 pool.close()

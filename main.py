@@ -46,8 +46,8 @@ def SiPM(times,other):
 	integral = signalInGate.sum()*sampling					# Calculating integrals
 	peak = signalInGate.max()								# Calculating peaks
 	tstart = np.argmax(signalInGate>1.5)*sampling			# Calculating starting times of signals
-	# tovert = np.count_nonzero(signalInGate>1.5)*sampling	# Calculating time over threshld
-	# tpeak = np.argmax(signalInGate)*sampling				# Calculating peaking time
+	tovert = np.count_nonzero(signalInGate>1.5)*sampling	# Calculating time over threshld
+	tpeak = np.argmax(signalInGate)*sampling				# Calculating peaking time
 	if args.Graphics:
 		if not args.signal:
 			dev = 'cpu-fast'
@@ -61,4 +61,4 @@ def SiPM(times,other):
 		sigPlot(signal,sigTimes,dcrTime,dev)
 	if args.wavedump is None:
 		signal = None
-	return(integral,peak,tstart,other,np.float32(signal))
+	return(integral,peak,tstart,tovert,tpeak,other,np.float32(signal))

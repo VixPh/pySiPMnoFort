@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7400) (preloaded format=pdflatex 2020.5.7)  14 MAY 2020 10:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7400) (preloaded format=pdflatex 2020.5.7)  14 MAY 2020 12:04
 entering extended mode
 **./doc.tex
 (doc.tex
@@ -519,9 +519,29 @@ Package: hypcap 2016/05/16 v1.12 Adjusting the anchors of captions (HO)
 Package: sphinxmessages 2019/01/04 v2.0 Localized LaTeX macros (Sphinx team)
 )
 LaTeX Info: Redefining \and on input line 75.
+LaTeX Font Info:    Trying to load font information for T1+ptm on input line 83
+.
+
+(/home/edo/.miktex/texmfs/install/tex/latex/psnfss/t1ptm.fd
+File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
+)<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>>
+LaTeX Font Info:    Trying to load font information for U+msa on input line 83.
+
+
+(/home/edo/.miktex/texmfs/install/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 83.
+
+
+(/home/edo/.miktex/texmfs/install/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+
+Package hyperref Warning: Ignoring empty anchor on input line 83.
+
 \@indexfile=\write4
 \openout4 = `doc.idx'.
-
 
 Writing index file doc.idx
 (/home/edo/.miktex/texmfs/install/tex/latex/l3backend/l3backend-pdfmode.def
@@ -532,30 +552,25 @@ File: l3backend-pdfmode.def 2020-03-12 L3 backend support: PDF mode
 (doc.aux)
 \openout1 = `doc.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 85.
-LaTeX Font Info:    ... okay on input line 85.
-LaTeX Font Info:    Trying to load font information for T1+ptm on input line 85
-.
- (/home/edo/.miktex/texmfs/install/tex/latex/psnfss/t1ptm.fd
-File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
-)
-(/home/edo/.miktex/texmfs/install/tex/context/base/mkii/supp-pdf.mkii
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 86.
+LaTeX Font Info:    ... okay on input line 86.
+ (/home/edo/.miktex/texmfs/install/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count285
 \scratchdimen=\dimen189
@@ -608,7 +623,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 \AtBeginShipoutBox=\box66
-Package hyperref Info: Link coloring ON on input line 85.
+Package hyperref Info: Link coloring ON on input line 86.
 (/home/edo/.miktex/texmfs/install/tex/latex/hyperref/nameref.sty
 Package: nameref 2019/09/16 v2.46 Cross-referencing by name of section
 
@@ -620,16 +635,16 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
 \c@section@level=\count291
 )
-LaTeX Info: Redefining \ref on input line 85.
-LaTeX Info: Redefining \pageref on input line 85.
-LaTeX Info: Redefining \nameref on input line 85.
+LaTeX Info: Redefining \ref on input line 86.
+LaTeX Info: Redefining \pageref on input line 86.
+LaTeX Info: Redefining \nameref on input line 86.
  (doc.out) (doc.out)
 \@outlinefile=\write5
 \openout5 = `doc.out'.
 
-Package hyperref Info: Option `pageanchor' set `false' on input line 88.
-<LogopySiPM.pdf, id=116, 845.0471pt x 597.51233pt>
-LaTeX Font Info:    Trying to load font information for T1+pcr on input line 88
+Package hyperref Info: Option `pageanchor' set `false' on input line 89.
+<LogopySiPM.pdf, id=120, 845.0471pt x 597.51233pt>
+LaTeX Font Info:    Trying to load font information for T1+pcr on input line 89
 .
 
 (/home/edo/.miktex/texmfs/install/tex/latex/psnfss/t1pcr.fd
@@ -637,31 +652,19 @@ File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
 File: LogopySiPM.pdf Graphic file (type pdf)
 <use LogopySiPM.pdf>
-Package pdftex.def Info: LogopySiPM.pdf  used on input line 88.
+Package pdftex.def Info: LogopySiPM.pdf  used on input line 89.
 (pdftex.def)             Requested size: 469.75456pt x 332.15207pt.
-LaTeX Font Info:    Trying to load font information for T1+phv on input line 88
+LaTeX Font Info:    Trying to load font information for T1+phv on input line 89
 .
 
 (/home/edo/.miktex/texmfs/install/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2020/03/25 scalable font definitions for T1/phv.
 )
 LaTeX Font Info:    Font shape `T1/phv/b/it' in size <10> not available
-(Font)              Font shape `T1/phv/b/sl' tried instead on input line 88.
+(Font)              Font shape `T1/phv/b/sl' tried instead on input line 89.
 LaTeX Font Info:    Font shape `T1/phv/b/it' in size <17.28> not available
-(Font)              Font shape `T1/phv/b/sl' tried instead on input line 88.
-<<ot1.cmap>><<oml.cmap>><<oms.cmap>><<omx.cmap>>
-LaTeX Font Info:    Trying to load font information for U+msa on input line 88.
-
-
-(/home/edo/.miktex/texmfs/install/tex/latex/amsfonts/umsa.fd
-File: umsa.fd 2013/01/14 v3.01 AMS symbols A
-)
-LaTeX Font Info:    Trying to load font information for U+msb on input line 88.
-
-
-(/home/edo/.miktex/texmfs/install/tex/latex/amsfonts/umsb.fd
-File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) [1
+(Font)              Font shape `T1/phv/b/sl' tried instead on input line 89.
+ [1
 
 {/home/edo/.miktex/texmfs/data/pdftex/config/pdftex.map} <./LogopySiPM.pdf>] [2
 
@@ -678,7 +681,7 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ]
 Chapter 1.
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 1
-21.
+22.
 (/home/edo/.miktex/texmfs/install/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 ) [1
@@ -689,11 +692,11 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 Chapter 2.
 [3]
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <9> not available
-(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 203.
+(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 204.
  [4]
 Chapter 3.
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
-(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 262.
+(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 263.
 [5
 
 ] [6] [7] [8] [9] [10]
@@ -711,12 +714,12 @@ Chapter 6.
 <simpmarray.jpg, id=304, 512.91624pt x 452.69125pt>
 File: simpmarray.jpg Graphic file (type jpg)
 <use simpmarray.jpg>
-Package pdftex.def Info: simpmarray.jpg  used on input line 1016.
+Package pdftex.def Info: simpmarray.jpg  used on input line 1017.
 (pdftex.def)             Requested size: 188.2019pt x 166.10472pt.
 <signals.png, id=305, 243.91125pt x 173.64874pt>
 File: signals.png Graphic file (type png)
 <use signals.png>
-Package pdftex.def Info: signals.png  used on input line 1021.
+Package pdftex.def Info: signals.png  used on input line 1022.
 (pdftex.def)             Requested size: 188.2019pt x 133.98816pt.
 [17 <./simpmarray.jpg>] [18 <./signals.png>]
 Chapter 7.
@@ -728,22 +731,22 @@ Chapter 7.
 
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1053.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1053.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1054.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1054.
  (doc.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1053.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1053.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1054.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1054.
 
 Package rerunfilecheck Info: File `doc.out' has not changed.
 (rerunfilecheck)             Checksum: 280F5BCAA724A979989D79BC3E937112;3288.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1053.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1054.
  ) 
 Here is how much of TeX's memory you used:
- 13617 strings out of 480931
- 194112 string characters out of 2907332
- 476661 words of memory out of 3000000
- 29072 multiletter control sequences out of 15000+200000
- 579733 words of font info for 83 fonts, out of 3000000 for 9000
+ 13651 strings out of 480931
+ 194479 string characters out of 2907332
+ 477172 words of memory out of 3000000
+ 29087 multiletter control sequences out of 15000+200000
+ 588843 words of font info for 99 fonts, out of 3000000 for 9000
  1142 hyphenation exceptions out of 8191
  38i,16n,49p,584b,544s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/home/edo/.miktex/texmfs/install/fonts/enc/dvips/base/8r.enc}</home/edo/.mik
@@ -764,7 +767,7 @@ ex/texmfs/install/fonts/type1/urw/helvetic/uhvr8a.pfb></home/edo/.miktex/texmfs
 /install/fonts/type1/urw/times/utmb8a.pfb></home/edo/.miktex/texmfs/install/fon
 ts/type1/urw/times/utmr8a.pfb></home/edo/.miktex/texmfs/install/fonts/type1/urw
 /times/utmri8a.pfb>
-Output written on doc.pdf (25 pages, 381879 bytes).
+Output written on doc.pdf (25 pages, 381949 bytes).
 PDF statistics:
  419 PDF objects out of 1000 (max. 8388607)
  76 named destinations out of 1000 (max. 500000)

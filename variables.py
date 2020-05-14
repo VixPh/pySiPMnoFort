@@ -51,15 +51,15 @@ global gpuMax		# If there are more pe than this value swich back to CPU (else it
 ###VARIABLES INITIALIZATION##
 
 # Simulation parameters
-siglen = 750			# in ns
+siglen = 500			# in ns
 sampling = 1			# in ns
 
 # SiPM parameters
 size = 1				# in mm
 cellsize = 25			# in um
 dcr = 200e3				# in Hz
-xt = 0.03				# in %
-ap = 0.02				# in %
+xt = 0.01				# in %
+ap = 0.03				# in %
 tfall = 50				# in ns
 trise = 1				# in ns
 cellrecovery = 20		# in ns
@@ -152,7 +152,8 @@ if args.fname is not None:
 	print(f'\nReding SiPM setting from: {args.fname:s}')
 	print('___________________________________')
 	f = open(args.fname)
-	print(f.read()+'___________________________________\n')
+	[print(l.rstrip()) for l in f.readlines() if not l.startswith('#')]
+	print('___________________________________\n')
 	f.close()
 	f = open(args.fname)
 	exec(f.read())							# Eventually load setting from external file
