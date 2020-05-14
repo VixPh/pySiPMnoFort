@@ -1,6 +1,6 @@
 # In this file I define all the global variables that I will use in other files.
-# f = open('files/banner.txt')
-# exec(f.read())
+f = open('files/banner.txt')
+exec(f.read())
 
 import importlib										# This module helps me to decide wich modules import and if they're installed
 import numpy as np										# Numpy is used to handle arrays
@@ -93,87 +93,87 @@ epilog = '''Try -g -G to get started :)\
 parser = argparse.ArgumentParser('pySiPM',add_help=False,description=description,
 epilog=epilog,
 formatter_class=argparse.RawDescriptionHelpFormatter)
-#
-# parser._optionals.title = 'Options for the simulation'
-# parser.add_argument('-H','--help',action='help',default=argparse.SUPPRESS)
-# parser.add_argument('-V', '--version', action='version',version='%(prog)s 0.1')
-# parser.add_argument('-d','--device',nargs='?',type=str,help='Select device for signal generation',choices=['cpu','gpu'],default='cpu')
-# parser.add_argument('-g','--graphics',action = 'count',help = 'Histograms of generated events')
-# parser.add_argument('-q','--quiet',action = 'count',help = 'Quiet')
-# parser.add_argument('-w','--write',nargs = '?',type = str,help = 'File to write as output',metavar='filename.root')
-# parser.add_argument('-G','--Graphics',action = 'count',help = 'Plot each signal (For debug purposes only)')
-# parser.add_argument('-j','--jobs',type = int,help = 'Number of jobs for multiprocessing',metavar='N')
-# parser.add_argument('-NDCR','--nodcr',action = 'count',help = 'Set DCR rate to 0')
-# parser.add_argument('-FDCR','--fastdcr',action = 'count',help = 'Faster generation of DCR')
-# parser.add_argument('-NXT','--noxt',action = 'count',help = 'Set XT rate to 0')
-# parser.add_argument('-FXT','--fastxt',action = 'count',help = 'Faster generation of XT')
-# parser.add_argument('-NAP','--noap',action = 'count',help = 'Set AP rate to 0')
-# parser.add_argument('-SIG','--signal',action='count',help = 'Generate each signal independently (slower)')
-# parser.add_argument('-f','--fname',nargs = '?',type = str ,help = 'Configuration file',metavar='filename.txt')
-# parser.add_argument('-W','--wavedump',nargs = '?',type = str ,help = 'Output Digitized Waveforms on hdf5 file',metavar='groupname')
-# parser.add_argument('-D','--clean',action='count',help = 'Clear old output files')
-# args = parser.parse_args()
-# del epilog
-# del description
-#
-# if importlib.find_loader('cupy') is None:
-# 	args.device = 'cpu'						# If Cupy is not installed use CPU
-#
-# if args.jobs is not None:					# If a number of jobs is choosen then it is used
-# 	nJobs = args.jobs
-# else:
-# 	nJobs = multiprocessing.cpu_count()		# If not specified all cores are used
-#
-# if args.quiet:
-# 	sys.stdout  =  open('/dev/null','w')	# Move all printed output to inexisting file # TODO: Find a smarter way to do so
-#
-# if args.nodcr:								# Set dcr rate to 0
-# 	dcr = 0
-# 	fastDCR = True
-#
-# if args.noxt:								# Set xt rate to 0
-# 	xt = 0
-# 	fastXT = True
-#
-# if args.noap:								# Set ap rate to 0
-# 	ap = 0
-#
-# if args.fastdcr:							# Sligtly faster generation of DCR
-# 	fastDCR  =  True
-#
-# if args.fastxt:								# Sligtly faster generation of XT
-# 	fastXT  =  True
-#
-# if args.signal:								# Refer to libs/lib file for a detailed description
-# 	fastSIG = False
-#
-#
-# if args.fname is not None:
-# 	print(f'\nReding SiPM setting from: {args.fname:s}')
-# 	print('___________________________________')
-# 	f = open(args.fname)
-# 	print(f.read()+'___________________________________\n')
-# 	f.close()
-# 	f = open(args.fname)
-# 	exec(f.read())							# Eventually load setting from external file
-# else:
-# 	print('\nUsing default SiPM settings!\n')	# Use settings defined above
-#
-# print('Detected %d cores...\r'%(multiprocessing.cpu_count()))
-# print('Initializing simulation on %d cores...\n'%(nJobs))
-# if args.signal is None:
-# 	print('Generating signals with the fast method on CPU (default)...')
-#
-# if args.signal is not None:
-# 	if args.device is None:
-# 		print('Generating signals on CPU')
-# 	if args.device is not None:
-# 		print('Generating signals on '+args.device.upper())
-#
-# if args.clean is not None:
-# 	if os.path.exists('waveforms.hdf5'):
-# 		os.remove('waveforms.hdf5')
-#
+
+parser._optionals.title = 'Options for the simulation'
+parser.add_argument('-H','--help',action='help',default=argparse.SUPPRESS)
+parser.add_argument('-V', '--version', action='version',version='%(prog)s 0.1')
+parser.add_argument('-d','--device',nargs='?',type=str,help='Select device for signal generation',choices=['cpu','gpu'],default='cpu')
+parser.add_argument('-g','--graphics',action = 'count',help = 'Histograms of generated events')
+parser.add_argument('-q','--quiet',action = 'count',help = 'Quiet')
+parser.add_argument('-w','--write',nargs = '?',type = str,help = 'File to write as output',metavar='filename.root')
+parser.add_argument('-G','--Graphics',action = 'count',help = 'Plot each signal (For debug purposes only)')
+parser.add_argument('-j','--jobs',type = int,help = 'Number of jobs for multiprocessing',metavar='N')
+parser.add_argument('-NDCR','--nodcr',action = 'count',help = 'Set DCR rate to 0')
+parser.add_argument('-FDCR','--fastdcr',action = 'count',help = 'Faster generation of DCR')
+parser.add_argument('-NXT','--noxt',action = 'count',help = 'Set XT rate to 0')
+parser.add_argument('-FXT','--fastxt',action = 'count',help = 'Faster generation of XT')
+parser.add_argument('-NAP','--noap',action = 'count',help = 'Set AP rate to 0')
+parser.add_argument('-SIG','--signal',action='count',help = 'Generate each signal independently (slower)')
+parser.add_argument('-f','--fname',nargs = '?',type = str ,help = 'Configuration file',metavar='filename.txt')
+parser.add_argument('-W','--wavedump',nargs = '?',type = str ,help = 'Output Digitized Waveforms on hdf5 file',metavar='groupname')
+parser.add_argument('-D','--clean',action='count',help = 'Clear old output files')
+args = parser.parse_args()
+del epilog
+del description
+
+if importlib.find_loader('cupy') is None:
+	args.device = 'cpu'						# If Cupy is not installed use CPU
+
+if args.jobs is not None:					# If a number of jobs is choosen then it is used
+	nJobs = args.jobs
+else:
+	nJobs = multiprocessing.cpu_count()		# If not specified all cores are used
+
+if args.quiet:
+	sys.stdout  =  open('/dev/null','w')	# Move all printed output to inexisting file # TODO: Find a smarter way to do so
+
+if args.nodcr:								# Set dcr rate to 0
+	dcr = 0
+	fastDCR = True
+
+if args.noxt:								# Set xt rate to 0
+	xt = 0
+	fastXT = True
+
+if args.noap:								# Set ap rate to 0
+	ap = 0
+
+if args.fastdcr:							# Sligtly faster generation of DCR
+	fastDCR  =  True
+
+if args.fastxt:								# Sligtly faster generation of XT
+	fastXT  =  True
+
+if args.signal:								# Refer to libs/lib file for a detailed description
+	fastSIG = False
+
+
+if args.fname is not None:
+	print(f'\nReding SiPM setting from: {args.fname:s}')
+	print('___________________________________')
+	f = open(args.fname)
+	print(f.read()+'___________________________________\n')
+	f.close()
+	f = open(args.fname)
+	exec(f.read())							# Eventually load setting from external file
+else:
+	print('\nUsing default SiPM settings!\n')	# Use settings defined above
+
+print('Detected %d cores...\r'%(multiprocessing.cpu_count()))
+print('Initializing simulation on %d cores...\n'%(nJobs))
+if args.signal is None:
+	print('Generating signals with the fast method on CPU (default)...')
+
+if args.signal is not None:
+	if args.device is None:
+		print('Generating signals on CPU')
+	if args.device is not None:
+		print('Generating signals on '+args.device.upper())
+
+if args.clean is not None:
+	if os.path.exists('waveforms.hdf5'):
+		os.remove('waveforms.hdf5')
+
 
 #################################################################################################################
 #################################>>> NOT EDITABLE VARIABLES   <<<################################################

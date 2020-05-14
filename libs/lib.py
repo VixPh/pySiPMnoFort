@@ -111,7 +111,7 @@ def SiPMEventAction(time,xt):
 	return(np.array(evtTimes,dtype='int32'),np.array(sigH,dtype='float32'))
 
 ### GENERATION OF SIGNALS SHAPES FAST ###
-if True:#args.signal is None:											# If generating signals fast (default)
+if args.signal is None:											# If generating signals fast (default)
 	x = np.arange(0,sigpts)
 	signalmodel = signalgenfortran(x,1,tfall,trise,sigpts,1)	# Define the model of my signal (calculate it only once)
 
