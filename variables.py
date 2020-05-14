@@ -4,7 +4,7 @@ exec(f.read())
 
 import importlib										# This module helps me to decide wich modules import and if they're installed
 import numpy as np										# Numpy is used to handle arrays
-if importlib.find_loader('cupy') is not None:
+if importlib.util.find_spec('cupy').loader is not None:
 	import cupy as cp									# Module equivalent to numpy but on GPU (needs Nvidia CUDA to be installed https://developer.nvidia.com/cuda-downloads )
 else:
 	print('Cupy not found, unable to run on GPU, will use CPU')
@@ -116,7 +116,7 @@ args = parser.parse_args()
 del epilog
 del description
 
-if importlib.find_loader('cupy') is None:
+if importlib.util.find_spec('cupy').loader is not None:
 	args.device = 'cpu'						# If Cupy is not installed use CPU
 
 if args.jobs is not None:					# If a number of jobs is choosen then it is used

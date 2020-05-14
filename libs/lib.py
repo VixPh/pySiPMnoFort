@@ -114,7 +114,6 @@ def SiPMEventAction(time,xt):
 if args.signal is None:											# If generating signals fast (default)
 	x = np.arange(0,sigpts)
 	signalmodel = signalgenfortran(x,1,tfall,trise,sigpts,1)	# Define the model of my signal (calculate it only once)
-
 	def SiPMSignalAction(times,sigH,SNR,basespread):							# Function that passes signals times and height to main function for generating signals
 		"""
 		signalGen(times,sigH,SNR,basespread)
@@ -168,7 +167,7 @@ if args.signal is None:											# If generating signals fast (default)
 			for i in range(nap):
 				apdel = random.expovariate(1/tauapfast)+random.expovariate(1/tauapslow)		# APs have a time delay exponential distribution
 				tap = np.int32(apdel/sampling+t)											# Each afterpulse has a delay from its "main" signal that follows a exp distribution
-				if tap<siglen:
+				if tap<sigpts:
 					hap = 1-exp(-apdel/tfall)													# Generate ap signal height as an RC circuit
 					sap = rollfortran(signalmodel,tap,gainvar,hap,sigpts)									# Generate ap signal as above
 					s += sap																	# Add each ap
@@ -213,10 +212,9 @@ def somestats(output):
 	c2 = ROOT.TCanvas('c2','Histogram',600,400)
 	c3 = ROOT.TCanvas('c3','Histogram',600,400)
 	c4 = ROOT.TCanvas('c4','Histogram',600,400)
-	c5 = ROOT.TCanvas('c5','Cumulatives',600,400)
+	c5 = ROOT.TCanvas('c5','Staircase',600,400)
 	c6 = ROOT.TCanvas('c6','Histogram',600,400)
 	c7 = ROOT.TCanvas('c7','Histogram',600,400)
-
 
 
 	h1 = ROOT.TH1F('Integral','Integral',750,integral.min(),integral.max())
@@ -225,15 +223,18 @@ def somestats(output):
 	h2 = ROOT.TH1F('Peak Value','Peak',750,peak.min(),peak.max())
 	h2.SetXTitle('Peak [A.U.]')
 	h2.SetYTitle('Entries')
-	h3 = ROOT.TH1F('Starting Time','Tstart',intgate,tstart.min()-1,tstart.max())
+	inf = tstart.min();sup =tstart.max(); n_bin = int((sup-inf)/sampling)
+	h3 = ROOT.TH1F('Starting Time','Tstart',n_bin,inf,sup)
 	h3.SetXTitle('Starting Time [ns]')
 	h4 = ROOT.TH2F('Histogram','Peak - Integral',200,min(peak),max(peak),200,min(integral),max(integral))
 	h4.SetXTitle('Peak [A.U.]')
 	h4.SetYTitle('Integral [A.U.]')
-	h5 = ROOT.TH1F('ToT','Time over threshld',intgate,0,tovert.max())
+	inf = 0;sup =tovert.max(); n_bin = int((sup-inf)/sampling)
+	h5 = ROOT.TH1F('ToT','Time over threshld',n_bin,inf,sup)
 	h5.SetXTitle('Time [ns]')
 	h5.SetYTitle('Entries')
-	h6 = ROOT.TH1F('ToP','Time of peak',intgate,0,tpeak.max())
+	inf = 0;sup =tpeak.max(); n_bin = int((sup-inf)/sampling)
+	h6 = ROOT.TH1F('ToP','Time of peak',n_bin,inf,sup)
 	h6.SetXTitle('Time [ns]')
 	h6.SetYTitle('Entries')
 	[h1.Fill(i) for i in integral]
@@ -252,7 +253,7 @@ def somestats(output):
 	h4.Draw("colz")
 	c5.cd()
 	c5.SetLogy()
-	staircase = h2.GetCumulative(False,' Cumulative')
+	staircase = h2.GetCumulative(False,' Staircase')
 	staircase.Scale(1e-3/h2.Integral()/(intgate*sampling*1e-9))
 	staircase.SetLineColor(2)
 	staircase.SetTitle('Staircase')
