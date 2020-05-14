@@ -55,7 +55,7 @@
 
           
             
-            <img src="_static/logo.png" class="logo" alt="Logo"/>
+            <img src="_static/LogopySiPM.svg" class="logo" alt="Logo"/>
           
           </a>
 
@@ -177,9 +177,10 @@
 <li><p><strong>Python</strong>: pySiPM is created using Python3.6 but it should also work with newer versions of Python.</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>Numpy</p></li>
-<li><p>Matplotlib</p></li>
-<li><p>Uproot</p></li>
+<li><p>numpy</p></li>
+<li><p>matplotlib</p></li>
+<li><p>uproot</p></li>
+<li><p>h5py</p></li>
 </ul>
 </div></blockquote>
 </li>
@@ -233,9 +234,10 @@ sudo sh cuda_10.2.89_440.33.01_linux.run
 </pre></div>
 </div>
 <p>Shared libraries can be eventually compiled manually by using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>f2py -c --opts <span class="o">=</span> <span class="s1">&#39;-O3 ...&#39;</span> -m FortranFunctions FortranFunctions.f90
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>
 </pre></div>
 </div>
+<p>f2py3.6 -c –opts = ‘-Ofast -funroll-all-loops -ffast-math -march=native -pipe’ -m FortranFunctions FortranFunctions.f90</p>
 </div>
 </div>
 

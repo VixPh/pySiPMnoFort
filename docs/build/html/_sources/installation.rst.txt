@@ -14,9 +14,10 @@ Obbligatory
 
 * **Python**: pySiPM is created using Python3.6 but it should also work with newer versions of Python.
 
-    * Numpy
-    * Matplotlib
-    * Uproot
+    * numpy
+    * matplotlib
+    * uproot
+    * h5py
 
 * **Cern ROOT**: Version 6.19 and newer. It has been tested on ROOT versions 6.19 - 6.20 and 6.20.2. At the moment ROOT is only used for visualization but in future versions it will be used for I/O operations. `Download ROOT <https://root.cern.ch/downloading-root>`_
 * **Fortran**: f2py is used to wrap fortran code. f2py is installed by default when installing Numpy.
@@ -76,4 +77,4 @@ Shared libraries can be eventually compiled manually by using:
 
 .. code-block:: bash
 
-  f2py -c --opts = '-O3 ...' -m FortranFunctions FortranFunctions.f90
+f2py3.6 -c --opts = '-Ofast -funroll-all-loops -ffast-math -march=native -pipe' -m FortranFunctions FortranFunctions.f90

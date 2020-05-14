@@ -53,7 +53,7 @@
 
           
             
-            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+            <img src="../_static/LogopySiPM.svg" class="logo" alt="Logo"/>
           
           </a>
 
@@ -189,11 +189,11 @@
 	<span class="n">dcrTime</span> <span class="o">=</span> <span class="n">addDCR</span><span class="p">(</span><span class="n">dcr</span><span class="p">)</span>									<span class="c1">#Generate DCR events (times)</span>
 	<span class="k">if</span> <span class="n">dcrTime</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
 		<span class="n">times</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">times</span><span class="p">,</span><span class="n">dcrTime</span><span class="p">))</span>						<span class="c1"># Concatenate DCR events with photoelectrons events</span>
-		<span class="n">sigTimes</span><span class="p">,</span><span class="n">sigH</span> <span class="o">=</span> <span class="n">evtsGen</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">xt</span><span class="p">)</span>						<span class="c1"># Update list of times considering SiPM matrix occupancy and recovery times</span>
+		<span class="n">sigTimes</span><span class="p">,</span><span class="n">sigH</span> <span class="o">=</span> <span class="n">SiPMEventAction</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">xt</span><span class="p">)</span>			<span class="c1"># Update list of times considering SiPM matrix occupancy and recovery times</span>
 	<span class="k">else</span><span class="p">:</span>
-		<span class="n">sigTimes</span><span class="p">,</span><span class="n">sigH</span> <span class="o">=</span> <span class="n">evtsGen</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">xt</span><span class="p">)</span>						<span class="c1"># Update list of times considering SiPM matrix occupancy and recovery times</span>
+		<span class="n">sigTimes</span><span class="p">,</span><span class="n">sigH</span> <span class="o">=</span> <span class="n">SiPMEventAction</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">xt</span><span class="p">)</span>			<span class="c1"># Update list of times considering SiPM matrix occupancy and recovery times</span>
 
-	<span class="n">signal</span> <span class="o">=</span> <span class="n">signalGen</span><span class="p">(</span><span class="n">sigTimes</span><span class="p">,</span><span class="n">sigH</span><span class="p">,</span><span class="n">SNR</span><span class="p">,</span><span class="n">basespread</span><span class="p">)</span>		<span class="c1"># Generate digital signals</span>
+	<span class="n">signal</span> <span class="o">=</span> <span class="n">SiPMSignalAction</span><span class="p">(</span><span class="n">sigTimes</span><span class="p">,</span><span class="n">sigH</span><span class="p">,</span><span class="n">SNR</span><span class="p">,</span><span class="n">basespread</span><span class="p">)</span>	<span class="c1"># Generate digital signals</span>
 
 	<span class="n">signalInGate</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">intstart</span><span class="p">:</span><span class="n">intstart</span><span class="o">+</span><span class="n">intgate</span><span class="p">]</span>		<span class="c1"># Select signal in the integration gate</span>
 	<span class="n">integral</span> <span class="o">=</span> <span class="n">signalInGate</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="n">sampling</span>					<span class="c1"># Calculating integrals</span>

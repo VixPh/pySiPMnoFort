@@ -53,7 +53,7 @@
 
           
             
-            <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+            <img src="../../_static/LogopySiPM.svg" class="logo" alt="Logo"/>
           
           </a>
 
@@ -188,7 +188,7 @@
 	<span class="k">return</span><span class="p">(</span><span class="n">dcrTime</span><span class="p">)</span></div>
 
 <span class="c1">###FUNCTION TO UPDATE THE SIPM MATRIX ARRAY###</span>
-<div class="viewcode-block" id="evtsGen"><a class="viewcode-back" href="../../structure.html#libs.lib.evtsGen">[docs]</a><span class="k">def</span> <span class="nf">evtsGen</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">xt</span><span class="p">):</span>
+<div class="viewcode-block" id="SiPMEventAction"><a class="viewcode-back" href="../../structure.html#libs.lib.SiPMEventAction">[docs]</a><span class="k">def</span> <span class="nf">SiPMEventAction</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">xt</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	evtsGen(time,xt)</span>
 
@@ -268,7 +268,7 @@
 	<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">sigpts</span><span class="p">)</span>
 	<span class="n">signalmodel</span> <span class="o">=</span> <span class="n">signalgenfortran</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">tfall</span><span class="p">,</span><span class="n">trise</span><span class="p">,</span><span class="n">sigpts</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>	<span class="c1"># Define the model of my signal (calculate it only once)</span>
 
-<div class="viewcode-block" id="signalGen"><a class="viewcode-back" href="../../structure.html#libs.lib.signalGen">[docs]</a>	<span class="k">def</span> <span class="nf">signalGen</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">sigH</span><span class="p">,</span><span class="n">SNR</span><span class="p">,</span><span class="n">basespread</span><span class="p">):</span>							<span class="c1"># Function that passes signals times and height to main function for generating signals</span>
+<div class="viewcode-block" id="SiPMSignalAction"><a class="viewcode-back" href="../../structure.html#libs.lib.SiPMSignalAction">[docs]</a>	<span class="k">def</span> <span class="nf">SiPMSignalAction</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">sigH</span><span class="p">,</span><span class="n">SNR</span><span class="p">,</span><span class="n">basespread</span><span class="p">):</span>							<span class="c1"># Function that passes signals times and height to main function for generating signals</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		signalGen(times,sigH,SNR,basespread)</span>
 
@@ -399,7 +399,7 @@
 	<span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Press &lt;RET&gt; to continue...&#39;</span><span class="p">)</span>
 	<span class="k">return</span></div>
 
-<span class="n">drawn</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span><span class="o">*</span><span class="mi">4</span><span class="c1">#nJobs</span>
+<span class="n">drawn</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span><span class="o">*</span><span class="mi">0</span><span class="c1">#nJobs</span>
 <div class="viewcode-block" id="sigPlot"><a class="viewcode-back" href="../../structure.html#libs.lib.sigPlot">[docs]</a><span class="k">def</span> <span class="nf">sigPlot</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span><span class="n">sigTimes</span><span class="p">,</span><span class="n">dcrTime</span><span class="p">,</span><span class="n">dev</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	sigPlot(signal,sigTimes,dcrTime,dev)</span>

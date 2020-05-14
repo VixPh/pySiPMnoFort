@@ -7,7 +7,7 @@
 \contentsline {section}{\numberline {2.1}Requirments}{3}{section.2.1}%
 \contentsline {subsection}{\numberline {2.1.1}Obbligatory}{3}{subsection.2.1.1}%
 \contentsline {subsection}{\numberline {2.1.2}Optional}{3}{subsection.2.1.2}%
-\contentsline {section}{\numberline {2.2}Linux How To}{3}{section.2.2}%
+\contentsline {section}{\numberline {2.2}Linux How To}{4}{section.2.2}%
 \contentsline {section}{\numberline {2.3}Compilation of shared libraries}{4}{section.2.3}%
 \contentsline {chapter}{\numberline {3}Files Structure}{5}{chapter.3}%
 \contentsline {section}{\numberline {3.1}Main}{5}{section.3.1}%

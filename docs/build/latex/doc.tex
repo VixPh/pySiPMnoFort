@@ -76,10 +76,10 @@
 
 
 \title{pySiPM Documentation}
-\date{May 07, 2020}
+\date{May 14, 2020}
 \release{0.1}
 \author{Edoardo Proserpio\and Massimiliano Antonello\and Romualdo Santoro}
-\newcommand{\sphinxlogo}{\sphinxincludegraphics{logo.png}\par}
+\newcommand{\sphinxlogo}{\sphinxincludegraphics{LogopySiPM.pdf}\par}
 \renewcommand{\releasename}{Release}
 \makeindex
 \begin{document}
@@ -146,13 +146,16 @@ At the moment pySiPM is just a collection of .py files including all the necessa
 \sphinxstylestrong{Python}: pySiPM is created using Python3.6 but it should also work with newer versions of Python.
 \begin{itemize}
 \item {} 
-Numpy
+numpy
 
 \item {} 
-Matplotlib
+matplotlib
 
 \item {} 
-Uproot
+uproot
+
+\item {} 
+h5py
 
 \end{itemize}
 
@@ -227,8 +230,10 @@ python3 Makefile.py
 Shared libraries can be eventually compiled manually by using:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-f2py \PYGZhy{}c \PYGZhy{}\PYGZhy{}opts \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}\PYGZhy{}O3 ...\PYGZsq{}} \PYGZhy{}m FortranFunctions FortranFunctions.f90
+
 \end{sphinxVerbatim}
+
+f2py3.6 \sphinxhyphen{}c \textendash{}opts = ‘\sphinxhyphen{}Ofast \sphinxhyphen{}funroll\sphinxhyphen{}all\sphinxhyphen{}loops \sphinxhyphen{}ffast\sphinxhyphen{}math \sphinxhyphen{}march=native \sphinxhyphen{}pipe’ \sphinxhyphen{}m FortranFunctions FortranFunctions.f90
 
 
 \chapter{Files Structure}
@@ -408,10 +413,12 @@ np.ndarray
 
 \end{fulllineitems}
 
-\index{evtsGen() (in module libs.lib)@\spxentry{evtsGen()}\spxextra{in module libs.lib}}
+\index{SiPMEventAction() (in module libs.lib)@\spxentry{SiPMEventAction()}\spxextra{in module libs.lib}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{structure:libs.lib.evtsGen}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{libs.lib.}}\sphinxbfcode{\sphinxupquote{evtsGen}}}{\emph{\DUrole{n}{time}}, \emph{\DUrole{n}{xt}}}{}
+\phantomsection\label{\detokenize{structure:libs.lib.SiPMEventAction}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{libs.lib.}}\sphinxbfcode{\sphinxupquote{SiPMEventAction}}}{\emph{\DUrole{n}{time}}, \emph{\DUrole{n}{xt}}}{}
+evtsGen(time,xt)
+
 Function that calculates signal height for each SiPM cell and adds optical crosstalk events.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
@@ -438,10 +445,12 @@ Function that calculates signal height for each SiPM cell and adds optical cross
 
 \end{fulllineitems}
 
-\index{signalGen() (in module libs.lib)@\spxentry{signalGen()}\spxextra{in module libs.lib}}
+\index{SiPMSignalAction() (in module libs.lib)@\spxentry{SiPMSignalAction()}\spxextra{in module libs.lib}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{structure:libs.lib.signalGen}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{libs.lib.}}\sphinxbfcode{\sphinxupquote{signalGen}}}{\emph{\DUrole{n}{times}}, \emph{\DUrole{n}{sigH}}, \emph{\DUrole{n}{SNR}}, \emph{\DUrole{n}{basespread}}}{}
+\phantomsection\label{\detokenize{structure:libs.lib.SiPMSignalAction}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{libs.lib.}}\sphinxbfcode{\sphinxupquote{SiPMSignalAction}}}{\emph{\DUrole{n}{times}}, \emph{\DUrole{n}{sigH}}, \emph{\DUrole{n}{SNR}}, \emph{\DUrole{n}{basespread}}}{}
+signalGen(times,sigH,SNR,basespread)
+
 Function that passes signal height and times to the main function that generates single signals. Also adds noise.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
@@ -552,10 +561,10 @@ See docs for a detailed description of integral, peak and tstart
 \item[] This file contains the functions used to compute the SiPM signal using the CPU.
 \item[] Here is a brief description of all the functions with their signature.
 \end{DUlineblock}
-\index{signalGen() (in module libs.libCPU)@\spxentry{signalGen()}\spxextra{in module libs.libCPU}}
+\index{SiPMSignalAction() (in module libs.libCPU)@\spxentry{SiPMSignalAction()}\spxextra{in module libs.libCPU}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{structure:libs.libCPU.signalGen}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{libs.libCPU.}}\sphinxbfcode{\sphinxupquote{signalGen}}}{\emph{\DUrole{n}{times}}, \emph{\DUrole{n}{sigH}}, \emph{\DUrole{n}{SNR}}, \emph{\DUrole{n}{basespread}}}{}
+\phantomsection\label{\detokenize{structure:libs.libCPU.SiPMSignalAction}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{libs.libCPU.}}\sphinxbfcode{\sphinxupquote{SiPMSignalAction}}}{\emph{\DUrole{n}{times}}, \emph{\DUrole{n}{sigH}}, \emph{\DUrole{n}{SNR}}, \emph{\DUrole{n}{basespread}}}{}
 Function that passes signal height and times to the main function that generates single signals. Also adds noise.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
@@ -587,7 +596,7 @@ np.ndarray
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{structure:libs.libCPU.PulseCPU}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{libs.libCPU.}}\sphinxbfcode{\sphinxupquote{PulseCPU}}}{\emph{\DUrole{n}{t}}, \emph{\DUrole{n}{h}}}{}
-Function that generates the signal from a single SiPM cell. This is the “full” version that computes the signal shape on CPU
+Function that generates the signal from a single SiPM cell. This is the “full” version that computes the signal shape on CPU by evaluating the signal shape function.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
@@ -616,11 +625,14 @@ np.ndarray
 \item[] This file contains the functions used to compute the SiPM signal using the GPU.
 \item[] Here is a brief description of all the functions with their signature.
 \end{DUlineblock}
-\index{signalGen() (in module libs.libGPU)@\spxentry{signalGen()}\spxextra{in module libs.libGPU}}
+\index{SiPMSignalAction() (in module libs.libGPU)@\spxentry{SiPMSignalAction()}\spxextra{in module libs.libGPU}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{structure:libs.libGPU.signalGen}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{libs.libGPU.}}\sphinxbfcode{\sphinxupquote{signalGen}}}{\emph{\DUrole{n}{times}}, \emph{\DUrole{n}{sigH}}, \emph{\DUrole{n}{SNR}}, \emph{\DUrole{n}{basespread}}}{}
+\phantomsection\label{\detokenize{structure:libs.libGPU.SiPMSignalAction}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{libs.libGPU.}}\sphinxbfcode{\sphinxupquote{SiPMSignalAction}}}{\emph{\DUrole{n}{times}}, \emph{\DUrole{n}{sigH}}, \emph{\DUrole{n}{SNR}}, \emph{\DUrole{n}{basespread}}}{}
+signalGen(times,sigH,SNR,basespread)
+
 Function that passes signal height and times to the main function that generates signals. Also adds noise.
+If the number of signals to generate is small uses CPU, else uses GPU to speed up the computation.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
@@ -651,7 +663,7 @@ np.ndarray
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{structure:libs.libGPU.PulseCPU}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{libs.libGPU.}}\sphinxbfcode{\sphinxupquote{PulseCPU}}}{\emph{\DUrole{n}{t}}, \emph{\DUrole{n}{h}}}{}
-Function that generates the signal from a single SiPM cell. This is the “full” version that computes the signal shape on CPU
+Function that generates the signal from a single SiPM cell. This is the “full” version that computes the signal shape on CPU by evaluating the signal shape function.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
@@ -678,7 +690,7 @@ np.ndarray
 \phantomsection\label{\detokenize{structure:libs.libGPU.PulseGPU}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{libs.libGPU.}}\sphinxbfcode{\sphinxupquote{PulseGPU}}}{\emph{\DUrole{n}{t}}, \emph{\DUrole{n}{h}}}{}
 PulseCPU(t,h)
 
-Function that generates the signal from all SiPM cells at once. This is the “full” version that computes the signal shape on GPU
+Function that generates the signal from all SiPM cells at once. This is the “full” version that computes the signal shape on GPU.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
@@ -787,6 +799,7 @@ Enables faster generation of optical crosstalk {\hyperref[\detokenize{theory:xtt
 Enables computation of each single signal (slower)
 \item [\sphinxhyphen{}j \textless{}N\textgreater{}]  
 Set the number of parallel workers to N (default is the number of cores detected)
+\sphinxhyphen{}d \textless{}dev\textgreater{} If using \sphinxhyphen{}SIG option this can select the device to use \sphinxtitleref{cpu} or \sphinxtitleref{gpu}
 \item [\sphinxhyphen{}f \textless{}file.txt\textgreater{}]  
 Reads the configuration file selected
 \item [\sphinxhyphen{}w \textless{}file.root\textgreater{}]  
@@ -902,7 +915,7 @@ The spread of the peak height of the single cell signal. Its value is the \(\sig
 
 \begin{fulllineitems}
 \pysigline{\sphinxbfcode{\sphinxupquote{SNR~:~double}}}
-The signal to noise ratio of the noise generated. As signal it is considered the mean value of the first peak in the multi\sphinxhyphen{}photon peak spectrum and as noise it is considered the \(\sigma\) “zero peak”.
+The signal to noise ratio of the noise generated. As signal it is considered the mean value of the first peak in the multi\sphinxhyphen{}photon peak spectrum and as noise it is considered the \(\sigma\) "zero peak".
 To generate the white gaussian noise this value is converted in sigma:
 \begin{equation*}
 \begin{split}\sigma_{noise} = \sqrt{10^{-SNR/20}}\end{split}

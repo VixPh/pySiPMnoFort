@@ -43,6 +43,7 @@ Some command line options can be parsed to de simulation and can be used to quic
     -FXT  Enables faster generation of optical crosstalk :ref:`xttheory`
     -SIG  Enables computation of each single signal (slower)
     -j <N>  Set the number of parallel workers to N (default is the number of cores detected)
+		-d <dev> If using -SIG option this can select the device to use `cpu` or `gpu`
     -f <file.txt>  Reads the configuration file selected
     -w <file.root>  Writes the results on a rootfile.
     -W <file>  Saves each digitized wave in a group of a hdf5 file.

@@ -53,7 +53,7 @@
 
           
             
-            <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+            <img src="../../_static/LogopySiPM.svg" class="logo" alt="Logo"/>
           
           </a>
 
@@ -170,7 +170,7 @@
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	PulseCPU(t,h)</span>
 
-<span class="sd">	Function that generates the signal from all SiPM cells at once. This is the &quot;full&quot; version that computes the signal shape on GPU</span>
+<span class="sd">	Function that generates the signal from all SiPM cells at once. This is the &quot;full&quot; version that computes the signal shape on GPU.</span>
 
 <span class="sd">	Parameters</span>
 <span class="sd">	----------</span>
@@ -208,7 +208,7 @@
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	PulseCPU(t,h)</span>
 
-<span class="sd">	Function that generates the signal from a single SiPM cell. This is the &quot;full&quot; version that computes the signal shape on CPU</span>
+<span class="sd">	Function that generates the signal from a single SiPM cell. This is the &quot;full&quot; version that computes the signal shape on CPU by evaluating the signal shape function.</span>
 
 <span class="sd">	Parameters</span>
 <span class="sd">	----------</span>
@@ -233,11 +233,12 @@
 			<span class="n">s</span> <span class="o">+=</span> <span class="n">signalgenfortran</span><span class="p">(</span><span class="n">tap</span><span class="p">,</span><span class="n">hap</span><span class="p">,</span><span class="n">tfall</span><span class="p">,</span><span class="n">trise</span><span class="p">,</span><span class="n">sigpts</span><span class="p">,</span><span class="n">gainvar</span><span class="p">)</span>
 	<span class="k">return</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="signalGen"><a class="viewcode-back" href="../../structure.html#libs.libGPU.signalGen">[docs]</a><span class="k">def</span> <span class="nf">signalGen</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">sigH</span><span class="p">,</span><span class="n">SNR</span><span class="p">,</span><span class="n">basespread</span><span class="p">):</span>												<span class="c1"># Function that passes signals times and height to main function for generating signals</span>
+<div class="viewcode-block" id="SiPMSignalAction"><a class="viewcode-back" href="../../structure.html#libs.libGPU.SiPMSignalAction">[docs]</a><span class="k">def</span> <span class="nf">SiPMSignalAction</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">sigH</span><span class="p">,</span><span class="n">SNR</span><span class="p">,</span><span class="n">basespread</span><span class="p">):</span>												<span class="c1"># Function that passes signals times and height to main function for generating signals</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	signalGen(times,sigH,SNR,basespread)</span>
 
 <span class="sd">	Function that passes signal height and times to the main function that generates signals. Also adds noise.</span>
+<span class="sd">	If the number of signals to generate is small uses CPU, else uses GPU to speed up the computation.</span>
 
 <span class="sd">	Parameters</span>
 <span class="sd">	----------</span>

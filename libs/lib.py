@@ -111,7 +111,7 @@ def SiPMEventAction(time,xt):
 	return(np.array(evtTimes,dtype='int32'),np.array(sigH,dtype='float32'))
 
 ### GENERATION OF SIGNALS SHAPES FAST ###
-if args.signal is None:											# If generating signals fast (default)
+if True:#args.signal is None:											# If generating signals fast (default)
 	x = np.arange(0,sigpts)
 	signalmodel = signalgenfortran(x,1,tfall,trise,sigpts,1)	# Define the model of my signal (calculate it only once)
 
@@ -246,7 +246,7 @@ def somestats(output):
 	input('Press <RET> to continue...')
 	return
 
-drawn = [False]*nJobs
+drawn = [False]*0#nJobs
 def sigPlot(signal,sigTimes,dcrTime,dev):
 	"""
 	sigPlot(signal,sigTimes,dcrTime,dev)

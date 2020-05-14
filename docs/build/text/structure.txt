@@ -1,0 +1,388 @@
+Files Structure
+***************
+
+In this section the file structure used to build the simulation is
+explained. You can find a brief description of the files used and they
+content. For a detailed explanation see the individual sections.
+
+
+Main
+====
+
+The simulation is made of a series of function and variables that are
+used in the main file to generate a SiPM event. In the main file the
+number of cells triggered is calculated and the signal is generated
+accordingly. In this file the signal is also analysed.
+
+The structure of the main file may be modified by the user to include
+more advanced analysis of the digitised.  signal.
+
+
+main.py
+-------
+
+In this file the functions present in the *libs* folder are combined
+to generate a complete SiPM event
+
+main.SiPM(times, other)
+
+   Function that calls all the procedures defined in libs to generate
+   a complete SiPM event.
+
+   Parameters:
+      * **times** (*np.ndarray*) – This array contains the arriving
+        time of each photon on the SiPM sensor surface. This array is
+        the input of the simulation.
+
+      * **other** (*tuple*) – This variable may contain other
+        informations about the event generated. It can be the event
+        id, the arriving time inserted in the simulation or the real
+        number of photons inserted in the simulation. This tuple will
+        be copied as it is in the output.
+
+   Returns:
+      * **integral** (*double*) – The integral of the signal
+        calculated in the integration gate
+
+      * **peak** (*double*) – The height of the signal in the
+        integration gate
+
+      * **tstart** (*double*) – The time of arrival of the signal in
+        ns defined as the first sample over the threshld of 1.5
+
+      * **other** (*tuple*) – The copy of the *other* variable given
+        in the input
+
+      * **signal** (*np.ndarray(float32)*) – If the options -W is
+        enabled the complete SiPM signal will be passed in the output.
+        Otherwise this output is None
+
+
+Variables
+=========
+
+
+variables.py
+------------
+
+   The file *variables.py* contains all the variables needed to describe the SiPM sensor, the simulation behavior and the signal analysis.
+   Here is a brief description of all the parameters with their default value.
+
+* SiPM Settings:
+
+  * "size = 1" Size of the SiPM sensitive area in mm (side)
+
+  * "cellsize = 25" Pitch of a single sensitive cell in um
+
+  * "dcr = 200e3" Dark count rate in kHz
+
+  * "xt = 0.03" Optical crosstalk probability
+
+  * "ap = 0.02" Afterpulsing probability
+
+  * "trise = 1" Rising time of the signal in ns
+
+  * "tfall = 50" Falling time of the signal in ns
+
+  * "cellrecovery = 20" Recovery time of the single SiPM cell in ns
+
+  * "tauapfast = 15" Time constant of afterpulses delay in ns (fast
+    component)
+
+  * "tauapslow = 85" Time constant of afterpulses delay in ns (slow
+    component)
+
+  * "ccgv = 0.05" Cell to cell gain variation (sigma)
+
+  * "SNR = 30" Signal to noise ratio
+
+  * "basespread = 0" Spread of the baseline of the signal (sigma)
+
+* Signal analysis settings:
+
+  * "siglen = 500" Total length of the signal in ns
+
+  * "sampling = 0.1" Samlping time in ns (1 = 1ns, 0.1 = 100ps)
+
+  * "intstart = 20" Start of the integration gate in ns
+
+  * "intgate = 300" Length of the integration gate in ns
+
+  * "pregate = 20" Length of the pregate
+
+* Simulation settings:
+
+  * "fastDCR = False" Enables faster generation of dark count events
+
+  * "fastXT = False"  Enable faster generation of crosstalk events
+
+  * "fastSIG = True"  Enables faster computation of signals
+
+For a more detailed description of each variable see …
+
+
+Functions
+=========
+
+
+libs/lib.py
+-----------
+
+   This file contains all the functions that are used to generate the event and the SiPM signal.
+   Here is a brief description of all the functions with their signature.
+
+libs.lib.addDCR(rate)
+
+   Function that generates times of dcr events.
+
+   Parameters:
+      **rate** (*double*) – Rate of dcr in kHz
+
+   Returns:
+      **dcrTime** – Array containing dcr times
+
+   Return type:
+      np.ndarray
+
+libs.lib.SiPMEventAction(time, xt)
+
+   evtsGen(time,xt)
+
+   Function that calculates signal height for each SiPM cell and adds
+   optical crosstalk events.
+
+   Parameters:
+      * **time** (*np.ndarray*) – Array containing the time at which
+        SiPM cells are fired
+
+      * **xt** (*double*) – Value of optical crosstalk probability
+
+   Returns:
+      * **evtTimes** (*np.ndarray(int32)*) – Array containing the time
+        at wich SiPM cells are fired, including xt events (sorted)
+
+      * **sigH** (*np.ndarray(float32)*) – Array containing the pulse
+        height of each fired SiPM cell
+
+libs.lib.SiPMSignalAction(times, sigH, SNR, basespread)
+
+   signalGen(times,sigH,SNR,basespread)
+
+   Function that passes signal height and times to the main function
+   that generates single signals. Also adds noise.
+
+   Parameters:
+      * **times** (*np.ndarray**(**int32**)*) – Array containing the
+        time at wich SiPM cells are fired, including xt events
+        (sorted)
+
+      * **sigH** (*np.ndarray**(**float32**)*) – Array containing the
+        pulse height of each fired SiPM cell
+
+      * **SNR** (*double*) – The signal to noise ratio of the noise to
+        add
+
+      * **basespread** (*double*) – Sigma of the value to add as
+        baseline
+
+   Returns:
+      **signal** – Array containing the generated SiPM signal
+
+   Return type:
+      np.ndarray
+
+libs.lib.PulseCPU(t, h)
+
+   Function that generates the signal from a single SiPM cell. This is
+   the “fast” version that uses a pre-computed signal shape and
+   translates it in time.
+
+   Parameters:
+      * **t** (*int32*) – Time at which the cell is triggered
+
+      * **h** (*float32*) – The relative pulse height of the cell
+        signal
+
+   Returns:
+      **s** – Array containing the generated cell signal
+
+   Return type:
+      np.ndarray
+
+libs.lib.sigPlot(signal, sigTimes, dcrTime, dev)
+
+   Function that plots each signal pulse produced in the simulation.
+
+   Parameters:
+      * **signal** (*np.ndarray*) – Array containing the generated
+        SiPM signal
+
+      * **sigTimes** (*np.ndarray*) – Array containing all photons
+        events times (including xt)
+
+      * **dcrTime** (*np.ndarray*) – Array containing dcr events times
+
+      * **dev** (*str*) – String that describes the device on which
+        the signal is computed
+
+libs.lib.initializeRandomPool()
+
+   Function that initializes random seeds for each worker in the
+   multiprocessing Pool
+
+libs.lib.somestats(output)
+
+   Function that displays histograms of generated events
+
+   Parameters:
+      **output** (*np.ndarray*) – Array containing output of the
+      simulation. This array contains the integral, peak and starting
+      time in the first three columns.
+
+   Note:
+
+     See docs for a detailed description of integral, peak and tstart
+
+
+libs/libCPU.py
+--------------
+
+   This file contains the functions used to compute the SiPM signal using the CPU.
+   Here is a brief description of all the functions with their signature.
+
+libs.libCPU.SiPMSignalAction(times, sigH, SNR, basespread)
+
+   Function that passes signal height and times to the main function
+   that generates single signals. Also adds noise.
+
+   Parameters:
+      * **times** (*np.ndarray**(**int32**)*) – Array containing the
+        time at wich SiPM cells are fired, including xt events
+        (sorted)
+
+      * **sigH** (*np.ndarray**(**float32**)*) – Array containing the
+        pulse height of each fired SiPM cell
+
+      * **SNR** (*double*) – The signal to noise ratio of the noise to
+        add
+
+      * **basespread** (*double*) – Sigma of the value to add as
+        baseline
+
+   Returns:
+      **signal** – Array containing the generated SiPM signal
+
+   Return type:
+      np.ndarray
+
+libs.libCPU.PulseCPU(t, h)
+
+   Function that generates the signal from a single SiPM cell. This is
+   the “full” version that computes the signal shape on CPU by
+   evaluating the signal shape function.
+
+   Parameters:
+      * **t** (*int32*) – Time at which the cell is triggered
+
+      * **h** (*float32*) – The relative pulse height of the cell
+        signal
+
+   Returns:
+      **s** – Array containing the generated cell signal
+
+   Return type:
+      np.ndarray
+
+
+libs/libGPU.py
+--------------
+
+   This file contains the functions used to compute the SiPM signal using the GPU.
+   Here is a brief description of all the functions with their signature.
+
+libs.libGPU.SiPMSignalAction(times, sigH, SNR, basespread)
+
+   signalGen(times,sigH,SNR,basespread)
+
+   Function that passes signal height and times to the main function
+   that generates signals. Also adds noise. If the number of signals
+   to generate is small uses CPU, else uses GPU to speed up the
+   computation.
+
+   Parameters:
+      * **times** (*np.ndarray**(**int32**)*) – Array containing the
+        time at wich SiPM cells are fired, including xt events
+        (sorted)
+
+      * **sigH** (*np.ndarray**(**float32**)*) – Array containing the
+        pulse height of each fired SiPM cell
+
+      * **SNR** (*double*) – The signal to noise ratio of the noise to
+        add
+
+      * **basespread** (*double*) – Sigma of the value to add as
+        baseline
+
+   Returns:
+      **signal** – Array containing the generated SiPM signal
+
+   Return type:
+      np.ndarray
+
+libs.libGPU.PulseCPU(t, h)
+
+   Function that generates the signal from a single SiPM cell. This is
+   the “full” version that computes the signal shape on CPU by
+   evaluating the signal shape function.
+
+   Parameters:
+      * **t** (*int32*) – Time at which the cell is triggered
+
+      * **h** (*float32*) – The relative pulse height of the cell
+        signal
+
+   Returns:
+      **s** – Array containing the generated cell signal
+
+   Return type:
+      np.ndarray
+
+libs.libGPU.PulseGPU(t, h)
+
+   PulseCPU(t,h)
+
+   Function that generates the signal from all SiPM cells at once.
+   This is the “full” version that computes the signal shape on GPU.
+
+   Parameters:
+      * **t** (*np.ndarray**(**int32**)*) – Array containing times at
+        which each the cell is triggered
+
+      * **h** (*np.ndarray**(**float32**)*) – Array containing the
+        relative pulse height of each cell signal
+
+   Returns:
+      **s** – Array containing the generated SiPM signal
+
+   Return type:
+      np.ndarray
+
+
+Other
+=====
+
+
+scr
+---
+
+This folder contains the source file of the FORTRAN functions that are
+used to speed-up the simulation
+
+
+files
+-----
+
+This folder contains some files used by the simulation and contains
+pre-configurations of some SiPM models that can be eventually loaded.
+For an explanation on how to write and load an external configuration
+file see …

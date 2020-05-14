@@ -8,7 +8,7 @@ Main
 
 The simulation is made of a series of function and variables that are used in the main file to generate a SiPM event. In the main file the number of cells triggered is calculated and the signal is generated accordingly. In this file the signal is also analysed.
 
-The structure of the main file may be modified by the user to include more advanced analysis of the digitised.  signal. 
+The structure of the main file may be modified by the user to include more advanced analysis of the digitised.  signal.
 
 main.py
 *******
@@ -67,8 +67,8 @@ libs/lib.py
 
 .. currentmodule:: libs.lib
 .. autofunction:: addDCR
-.. autofunction:: evtsGen
-.. autofunction:: signalGen
+.. autofunction:: SiPMEventAction
+.. autofunction:: SiPMSignalAction
 .. autofunction:: PulseCPU
 .. autofunction:: sigPlot
 .. autofunction:: initializeRandomPool
@@ -81,7 +81,7 @@ libs/libCPU.py
 | Here is a brief description of all the functions with their signature.
 
 .. currentmodule:: libs.libCPU
-.. autofunction:: signalGen
+.. autofunction:: SiPMSignalAction
 .. autofunction:: PulseCPU
 
 libs/libGPU.py
@@ -91,7 +91,7 @@ libs/libGPU.py
 | Here is a brief description of all the functions with their signature.
 
 .. currentmodule:: libs.libGPU
-.. autofunction:: signalGen
+.. autofunction:: SiPMSignalAction
 .. autofunction:: PulseCPU
 .. autofunction:: PulseGPU
 

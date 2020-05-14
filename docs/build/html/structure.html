@@ -55,7 +55,7 @@
 
           
             
-            <img src="_static/logo.png" class="logo" alt="Logo"/>
+            <img src="_static/LogopySiPM.svg" class="logo" alt="Logo"/>
           
           </a>
 
@@ -283,9 +283,10 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="libs.lib.evtsGen">
-<code class="sig-prename descclassname">libs.lib.</code><code class="sig-name descname">evtsGen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span></em>, <em class="sig-param"><span class="n">xt</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/lib.html#evtsGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.lib.evtsGen" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that calculates signal height for each SiPM cell and adds optical crosstalk events.</p>
+<dt id="libs.lib.SiPMEventAction">
+<code class="sig-prename descclassname">libs.lib.</code><code class="sig-name descname">SiPMEventAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span></em>, <em class="sig-param"><span class="n">xt</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/lib.html#SiPMEventAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.lib.SiPMEventAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>evtsGen(time,xt)</p>
+<p>Function that calculates signal height for each SiPM cell and adds optical crosstalk events.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -304,9 +305,10 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="libs.lib.signalGen">
-<code class="sig-prename descclassname">libs.lib.</code><code class="sig-name descname">signalGen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">sigH</span></em>, <em class="sig-param"><span class="n">SNR</span></em>, <em class="sig-param"><span class="n">basespread</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/lib.html#signalGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.lib.signalGen" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that passes signal height and times to the main function that generates single signals. Also adds noise.</p>
+<dt id="libs.lib.SiPMSignalAction">
+<code class="sig-prename descclassname">libs.lib.</code><code class="sig-name descname">SiPMSignalAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">sigH</span></em>, <em class="sig-param"><span class="n">SNR</span></em>, <em class="sig-param"><span class="n">basespread</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/lib.html#SiPMSignalAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.lib.SiPMSignalAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>signalGen(times,sigH,SNR,basespread)</p>
+<p>Function that passes signal height and times to the main function that generates single signals. Also adds noise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -390,8 +392,8 @@
 <div class="line">Here is a brief description of all the functions with their signature.</div>
 </div>
 <dl class="py function">
-<dt id="libs.libCPU.signalGen">
-<code class="sig-prename descclassname">libs.libCPU.</code><code class="sig-name descname">signalGen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">sigH</span></em>, <em class="sig-param"><span class="n">SNR</span></em>, <em class="sig-param"><span class="n">basespread</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libCPU.html#signalGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libCPU.signalGen" title="Permalink to this definition">¶</a></dt>
+<dt id="libs.libCPU.SiPMSignalAction">
+<code class="sig-prename descclassname">libs.libCPU.</code><code class="sig-name descname">SiPMSignalAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">sigH</span></em>, <em class="sig-param"><span class="n">SNR</span></em>, <em class="sig-param"><span class="n">basespread</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libCPU.html#SiPMSignalAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libCPU.SiPMSignalAction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function that passes signal height and times to the main function that generates single signals. Also adds noise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -414,7 +416,7 @@
 <dl class="py function">
 <dt id="libs.libCPU.PulseCPU">
 <code class="sig-prename descclassname">libs.libCPU.</code><code class="sig-name descname">PulseCPU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libCPU.html#PulseCPU"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libCPU.PulseCPU" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that generates the signal from a single SiPM cell. This is the “full” version that computes the signal shape on CPU</p>
+<dd><p>Function that generates the signal from a single SiPM cell. This is the “full” version that computes the signal shape on CPU by evaluating the signal shape function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -439,9 +441,11 @@
 <div class="line">Here is a brief description of all the functions with their signature.</div>
 </div>
 <dl class="py function">
-<dt id="libs.libGPU.signalGen">
-<code class="sig-prename descclassname">libs.libGPU.</code><code class="sig-name descname">signalGen</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">sigH</span></em>, <em class="sig-param"><span class="n">SNR</span></em>, <em class="sig-param"><span class="n">basespread</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libGPU.html#signalGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libGPU.signalGen" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that passes signal height and times to the main function that generates signals. Also adds noise.</p>
+<dt id="libs.libGPU.SiPMSignalAction">
+<code class="sig-prename descclassname">libs.libGPU.</code><code class="sig-name descname">SiPMSignalAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">sigH</span></em>, <em class="sig-param"><span class="n">SNR</span></em>, <em class="sig-param"><span class="n">basespread</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libGPU.html#SiPMSignalAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libGPU.SiPMSignalAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>signalGen(times,sigH,SNR,basespread)</p>
+<p>Function that passes signal height and times to the main function that generates signals. Also adds noise.
+If the number of signals to generate is small uses CPU, else uses GPU to speed up the computation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -463,7 +467,7 @@
 <dl class="py function">
 <dt id="libs.libGPU.PulseCPU">
 <code class="sig-prename descclassname">libs.libGPU.</code><code class="sig-name descname">PulseCPU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libGPU.html#PulseCPU"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libGPU.PulseCPU" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that generates the signal from a single SiPM cell. This is the “full” version that computes the signal shape on CPU</p>
+<dd><p>Function that generates the signal from a single SiPM cell. This is the “full” version that computes the signal shape on CPU by evaluating the signal shape function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -484,7 +488,7 @@
 <dt id="libs.libGPU.PulseGPU">
 <code class="sig-prename descclassname">libs.libGPU.</code><code class="sig-name descname">PulseGPU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libGPU.html#PulseGPU"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libGPU.PulseGPU" title="Permalink to this definition">¶</a></dt>
 <dd><p>PulseCPU(t,h)</p>
-<p>Function that generates the signal from all SiPM cells at once. This is the “full” version that computes the signal shape on GPU</p>
+<p>Function that generates the signal from all SiPM cells at once. This is the “full” version that computes the signal shape on GPU.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

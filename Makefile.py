@@ -4,12 +4,12 @@ import numpy
 from numpy.distutils import fcompiler
 from numpy import f2py
 #distutils: define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-os.environ['CFLAGS']='-Ofast -funroll-loops -ffast-math -march=native -pipe'
+os.environ['CFLAGS']='-Ofast -funroll-all-loops -ffast-math -march=native -pipe'
 
 source = open('src/FortranFunctions.f90').read()
 modulename = 'FortranFunctions'
 
-fcompileropts = ["--opt=-Ofast -funroll-loops -ffast-math -march=native -pipe"]
+fcompileropts = ["--opt=-Ofast -funroll-all-loops -ffast-math -march=native -pipe"]
 check = f2py.compile(source=source,modulename=modulename,extra_args=fcompileropts,verbose=True,extension='.f90',)
 
 if check>0:

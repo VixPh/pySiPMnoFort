@@ -8,10 +8,6 @@
   \item \spxentry{addDCR()}\spxextra{in module libs.lib}, \hyperpage{7}
 
   \indexspace
-  \bigletter E
-  \item \spxentry{evtsGen()}\spxextra{in module libs.lib}, \hyperpage{7}
-
-  \indexspace
   \bigletter I
   \item \spxentry{initializeRandomPool()}\spxextra{in module libs.lib}, \hyperpage{8}
 
@@ -24,11 +20,12 @@
 
   \indexspace
   \bigletter S
-  \item \spxentry{signalGen()}\spxextra{in module libs.lib}, \hyperpage{7}
-  \item \spxentry{signalGen()}\spxextra{in module libs.libCPU}, \hyperpage{8}
-  \item \spxentry{signalGen()}\spxextra{in module libs.libGPU}, \hyperpage{9}
-  \item \spxentry{sigPlot()}\spxextra{in module libs.lib}, \hyperpage{7}
+  \item \spxentry{sigPlot()}\spxextra{in module libs.lib}, \hyperpage{8}
   \item \spxentry{SiPM()}\spxextra{in module main}, \hyperpage{5}
+  \item \spxentry{SiPMEventAction()}\spxextra{in module libs.lib}, \hyperpage{7}
+  \item \spxentry{SiPMSignalAction()}\spxextra{in module libs.lib}, \hyperpage{7}
+  \item \spxentry{SiPMSignalAction()}\spxextra{in module libs.libCPU}, \hyperpage{8}
+  \item \spxentry{SiPMSignalAction()}\spxextra{in module libs.libGPU}, \hyperpage{9}
   \item \spxentry{somestats()}\spxextra{in module libs.lib}, \hyperpage{8}
 
 \end{sphinxtheindex}
