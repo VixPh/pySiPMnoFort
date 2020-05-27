@@ -317,7 +317,7 @@ def sigPlot(signal,sigTimes,dcrTime,dev):
 
 	ax.plot(np.arange(sigpts)*sampling,signal,'-b',linewidth=0.5)
 
-	plt.pause(0.05)
+	plt.pause(0.25)
 	ax.lines[-1].remove()
 	t.remove()
 
@@ -369,7 +369,7 @@ def SaveFile(fname,output):
 	f['GeometryData']['FiberPhi'].newbasket(phi)
 
 def SaveWaves(fname,output):
-	signals = np.vstack(output[:,4])
+	signals = np.vstack(output[:,-1])
 
 	sipmsettings = [size,
 					cellsize,

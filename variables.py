@@ -72,7 +72,7 @@ ccgv = 0.05				# relative to single pe peack height (sigma)
 # Trigger parameters
 intstart = 20			# in ns
 intgate = 300			# in ns
-preg = 20			# in ns
+preg = 20				# in ns
 
 # Simulation parameters
 fastDCR = False

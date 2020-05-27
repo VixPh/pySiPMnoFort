@@ -9,3 +9,5 @@
 /docs/build/doctrees/
 *.pyc
 *.hdf5
+*.npy
+*.npz
