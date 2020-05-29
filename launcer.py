@@ -33,8 +33,8 @@ output = np.asarray(output)
 if args.graphics:
     somestats(output)
 
-if args.write is not None:
+if args.write:
     SaveFile(args.write,output)
 
-if args.wavedump is not None:
+if args.wavedump:
     SaveWaves(args.wavedump,output)
