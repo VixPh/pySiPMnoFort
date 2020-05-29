@@ -151,70 +151,79 @@
            <div itemprop="articleBody">
             
   <h1>Source code for main</h1><div class="highlight"><pre>
-<span></span><span class="c1">#Function of simulation</span>
+<span></span><span class="c1"># Function of simulation</span>
 <span class="kn">from</span> <span class="nn">libs.lib</span> <span class="kn">import</span> <span class="o">*</span>
 
-<div class="viewcode-block" id="SiPM"><a class="viewcode-back" href="../structure.html#main.SiPM">[docs]</a><span class="k">def</span> <span class="nf">SiPM</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	SiPM(times,other)</span>
 
-<span class="sd">	Function that calls all the procedures defined in libs to generate a complete SiPM event.</span>
+<div class="viewcode-block" id="SiPM"><a class="viewcode-back" href="../structure.html#main.SiPM">[docs]</a><span class="k">def</span> <span class="nf">SiPM</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SiPM(times,other)</span>
 
-<span class="sd">	Parameters</span>
-<span class="sd">	-----------</span>
-<span class="sd">	times : np.ndarray</span>
-<span class="sd">		This array contains the arriving time of each photon on the SiPM sensor surface. This array is the input of the simulation.</span>
+<span class="sd">    Function that calls all the procedures defined in libs to generate a complete SiPM event.</span>
 
-<span class="sd">	other : tuple</span>
-<span class="sd">		This variable may contain other informations about the event generated. It can be the event id, the arriving time inserted in the simulation or the real number of photons inserted in the simulation. This tuple will be copied as it is in the output.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    times : np.ndarray</span>
+<span class="sd">            This array contains the arriving time of each photon on the SiPM sensor surface.</span>
+<span class="sd">    This array is the input of the simulation.</span>
 
-<span class="sd">	Returns</span>
-<span class="sd">	----------</span>
-<span class="sd">	integral : double</span>
-<span class="sd">		The integral of the signal calculated in the integration gate</span>
+<span class="sd">    other : tuple</span>
+<span class="sd">            This variable may contain other informations about the event generated.</span>
+<span class="sd">    It can be the event id, the arriving time inserted in the simulation</span>
+<span class="sd">    or the real number of photons inserted in the simulation.</span>
+<span class="sd">    This tuple will be copied as it is in the output.</span>
 
-<span class="sd">	peak : double</span>
-<span class="sd">		The height of the signal in the integration gate</span>
+<span class="sd">    Returns</span>
+<span class="sd">    ----------</span>
+<span class="sd">    integral : double</span>
+<span class="sd">            The integral of the signal calculated in the integration gate</span>
 
-<span class="sd">	tstart : double</span>
-<span class="sd">		The time of arrival of the signal in ns defined as the first sample over the threshld of 1.5</span>
+<span class="sd">    peak : double</span>
+<span class="sd">            The height of the signal in the integration gate</span>
 
-<span class="sd">	other : tuple</span>
-<span class="sd">		The copy of the `other` variable given in the input</span>
+<span class="sd">    tstart : double</span>
+<span class="sd">            The time of arrival of the signal in ns defined as the first sample over the threshld of 1.5</span>
 
-<span class="sd">	signal : np.ndarray(float32)</span>
-<span class="sd">		If the options -W is enabled the complete SiPM signal will be passed in the output. Otherwise this output is None</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="c1">###SIMULATION CORE###</span>
-	<span class="n">dcrTime</span> <span class="o">=</span> <span class="n">addDCR</span><span class="p">(</span><span class="n">dcr</span><span class="p">)</span>									<span class="c1">#Generate DCR events (times)</span>
-	<span class="k">if</span> <span class="n">dcrTime</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-		<span class="n">times</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">times</span><span class="p">,</span><span class="n">dcrTime</span><span class="p">))</span>						<span class="c1"># Concatenate DCR events with photoelectrons events</span>
-		<span class="n">sigTimes</span><span class="p">,</span><span class="n">sigH</span> <span class="o">=</span> <span class="n">SiPMEventAction</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">xt</span><span class="p">)</span>			<span class="c1"># Update list of times considering SiPM matrix occupancy and recovery times</span>
-	<span class="k">else</span><span class="p">:</span>
-		<span class="n">sigTimes</span><span class="p">,</span><span class="n">sigH</span> <span class="o">=</span> <span class="n">SiPMEventAction</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">xt</span><span class="p">)</span>			<span class="c1"># Update list of times considering SiPM matrix occupancy and recovery times</span>
+<span class="sd">    other : tuple</span>
+<span class="sd">            The copy of the `other` variable given in the input</span>
 
-	<span class="n">signal</span> <span class="o">=</span> <span class="n">SiPMSignalAction</span><span class="p">(</span><span class="n">sigTimes</span><span class="p">,</span><span class="n">sigH</span><span class="p">,</span><span class="n">SNR</span><span class="p">,</span><span class="n">basespread</span><span class="p">)</span>	<span class="c1"># Generate digital signals</span>
+<span class="sd">    signal : np.ndarray(float32)</span>
+<span class="sd">            If the options -W is enabled the complete SiPM signal will be passed in the output.</span>
+<span class="sd">    Otherwise this output is None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-	<span class="n">signalInGate</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">intstart</span><span class="p">:</span><span class="n">intstart</span><span class="o">+</span><span class="n">intgate</span><span class="p">]</span>		<span class="c1"># Select signal in the integration gate</span>
-	<span class="n">integral</span> <span class="o">=</span> <span class="n">signalInGate</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="n">sampling</span>					<span class="c1"># Calculating integrals</span>
-	<span class="n">peak</span> <span class="o">=</span> <span class="n">signalInGate</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>								<span class="c1"># Calculating peaks</span>
-	<span class="n">tstart</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">signalInGate</span><span class="o">&gt;</span><span class="mf">1.5</span><span class="p">)</span><span class="o">*</span><span class="n">sampling</span>			<span class="c1"># Calculating starting times of signals</span>
-	<span class="c1"># tovert = np.count_nonzero(signalInGate&gt;1.5)*sampling	# Calculating time over threshld</span>
-	<span class="c1"># tpeak = np.argmax(signalInGate)*sampling				# Calculating peaking time</span>
-	<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">Graphics</span><span class="p">:</span>
-		<span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">signal</span><span class="p">:</span>
-			<span class="n">dev</span> <span class="o">=</span> <span class="s1">&#39;cpu-fast&#39;</span>
-		<span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span><span class="s1">&#39;cpu&#39;</span><span class="p">:</span>
-			<span class="n">dev</span> <span class="o">=</span> <span class="s1">&#39;cpu&#39;</span>
-		<span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s1">&#39;gpu&#39;</span><span class="p">:</span>
-			<span class="k">if</span> <span class="p">(</span><span class="n">times</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="n">cpuThreshold</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">times</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="n">gpuMax</span><span class="p">):</span>
-				<span class="n">dev</span> <span class="o">=</span> <span class="s1">&#39;gpu(cpu)&#39;</span>
-			<span class="k">else</span><span class="p">:</span>
-				<span class="n">dev</span> <span class="o">=</span> <span class="s1">&#39;gpu&#39;</span>
-		<span class="n">sigPlot</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span><span class="n">sigTimes</span><span class="p">,</span><span class="n">dcrTime</span><span class="p">,</span><span class="n">dev</span><span class="p">)</span>
-	<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">wavedump</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-		<span class="n">signal</span> <span class="o">=</span> <span class="kc">None</span>
-	<span class="k">return</span><span class="p">(</span><span class="n">integral</span><span class="p">,</span><span class="n">peak</span><span class="p">,</span><span class="n">tstart</span><span class="p">,</span><span class="n">other</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">signal</span><span class="p">))</span></div>
+    <span class="n">dcrTime</span> <span class="o">=</span> <span class="n">addDCR</span><span class="p">(</span><span class="n">DCR</span><span class="p">)</span>  <span class="c1"># Generate DCR events (times)</span>
+    <span class="k">if</span> <span class="n">dcrTime</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">times</span><span class="p">,</span> <span class="n">dcrTime</span><span class="p">))</span>
+    <span class="c1"># Update list of times and signal height</span>
+        <span class="n">sigTimes</span><span class="p">,</span> <span class="n">sigH</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">SiPMEventAction</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">XT</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sigTimes</span><span class="p">,</span> <span class="n">sigH</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">SiPMEventAction</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">XT</span><span class="p">)</span>
+
+    <span class="c1"># Generate digital signals</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">SiPMSignalAction</span><span class="p">(</span><span class="n">sigTimes</span><span class="p">,</span> <span class="n">sigH</span><span class="p">,</span> <span class="n">SNR</span><span class="p">,</span> <span class="n">BASESPREAD</span><span class="p">)</span>
+
+    <span class="c1"># Select signal in the integration gate</span>
+    <span class="n">signalInGate</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">INTSTART</span><span class="p">:</span><span class="n">INTSTART</span> <span class="o">+</span> <span class="n">INTGATE</span><span class="p">]</span>
+    <span class="n">integral</span> <span class="o">=</span> <span class="n">signalInGate</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">*</span> <span class="n">SAMPLING</span>
+    <span class="n">peak</span> <span class="o">=</span> <span class="n">signalInGate</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">tstart</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">signalInGate</span> <span class="o">&gt;</span> <span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">SAMPLING</span>
+    <span class="n">tovert</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">signalInGate</span> <span class="o">&gt;</span> <span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">SAMPLING</span>
+    <span class="n">tpeak</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">signalInGate</span><span class="p">)</span> <span class="o">*</span> <span class="n">SAMPLING</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">Graphics</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">signal</span><span class="p">:</span>
+            <span class="n">dev</span> <span class="o">=</span> <span class="s1">&#39;cpu-fast&#39;</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s1">&#39;cpu&#39;</span><span class="p">:</span>
+            <span class="n">dev</span> <span class="o">=</span> <span class="s1">&#39;cpu&#39;</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s1">&#39;gpu&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">times</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="n">CPUTHRESHOLD</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">times</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="n">GPUMAX</span><span class="p">):</span>
+                <span class="n">dev</span> <span class="o">=</span> <span class="s1">&#39;gpu(cpu)&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dev</span> <span class="o">=</span> <span class="s1">&#39;gpu&#39;</span>
+        <span class="n">sigPlot</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">sigTimes</span><span class="p">,</span> <span class="n">dcrTime</span><span class="p">,</span> <span class="n">dev</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">wavedump</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">integral</span><span class="p">,</span> <span class="n">peak</span><span class="p">,</span> <span class="n">tstart</span><span class="p">,</span> <span class="n">tovert</span><span class="p">,</span> <span class="n">tpeak</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">signal</span><span class="p">))</span></div>
 </pre></div>
 
            </div>

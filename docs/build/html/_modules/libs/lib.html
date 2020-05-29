@@ -151,374 +151,488 @@
            <div itemprop="articleBody">
             
   <h1>Source code for libs.lib</h1><div class="highlight"><pre>
-<span></span><span class="c1">#In this file I define all the functions I will use in the main file of simulation</span>
+<span></span><span class="c1"># In this file I define all the functions I will use in the main file of simulation</span>
+<span class="kn">from</span> <span class="nn">libs.FortranFunctions</span> <span class="kn">import</span> <span class="n">rollfortran</span><span class="p">,</span> <span class="n">signalgenfortran</span>
 <span class="kn">from</span> <span class="nn">variables</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">libs.FortranFunctions</span> <span class="kn">import</span> <span class="n">signalgenfortran</span>
-<span class="kn">from</span> <span class="nn">libs.FortranFunctions</span> <span class="kn">import</span> <span class="n">rollfortran</span>
-<span class="c1">#################################################################################################################</span>
-<span class="c1">################&gt;&gt;&gt;   EDITING THIS FILE MAY SERIOUSLY COMPROMISE SIMULATION BEHAVIOUR   &lt;&lt;&lt;######################</span>
-<span class="c1">#################################################################################################################</span>
 
-<span class="c1">###GENERATION OF DCR TIMES AND INDICES###</span>
-<div class="viewcode-block" id="addDCR"><a class="viewcode-back" href="../../structure.html#libs.lib.addDCR">[docs]</a><span class="k">def</span> <span class="nf">addDCR</span><span class="p">(</span><span class="n">rate</span><span class="p">):</span>											<span class="c1"># Generate dcr times</span>
-	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	addDCR(rate)</span>
+<span class="c1">###############################################################################</span>
+<span class="c1">##&gt;&gt;&gt;   EDITING THIS FILE MAY SERIOUSLY COMPROMISE SIMULATION BEHAVIOUR   &lt;&lt;&lt;##</span>
+<span class="c1">###############################################################################</span>
 
-<span class="sd">	Function that generates times of dcr events.</span>
+<span class="c1">###GENERATION OF DCR TIMES###</span>
+<div class="viewcode-block" id="addDCR"><a class="viewcode-back" href="../../structure.html#libs.lib.addDCR">[docs]</a><span class="k">def</span> <span class="nf">addDCR</span><span class="p">(</span><span class="n">rate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    addDCR(rate)</span>
 
-<span class="sd">	Parameters</span>
-<span class="sd">	------------</span>
-<span class="sd">	rate : double</span>
-<span class="sd">		Rate of dcr in kHz</span>
+<span class="sd">    Function that generates times of dcr events.</span>
 
-<span class="sd">	Returns</span>
-<span class="sd">	--------</span>
-<span class="sd">	dcrTime : np.ndarray</span>
-<span class="sd">		Array containing dcr times</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="k">if</span> <span class="n">fastDCR</span><span class="p">:</span>
-		<span class="n">ndcr</span> <span class="o">=</span> <span class="n">poisson</span><span class="p">(</span><span class="n">rate</span><span class="o">*</span><span class="n">siglen</span><span class="o">*</span><span class="mf">1e-9</span><span class="p">)</span>					<span class="c1"># Number of dcr events folows a poissonian distribution</span>
-		<span class="n">dcrTime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ndcr</span><span class="p">)</span><span class="o">*</span><span class="n">siglen</span>			<span class="c1"># dcr times are uniformly distributed</span>
-	<span class="k">else</span><span class="p">:</span>
-		<span class="n">dcrTime</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-		<span class="k">while</span> <span class="n">dcrTime</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;</span><span class="n">siglen</span><span class="p">:</span>						<span class="c1"># Generate dcr starting from exponential distribution of delays</span>
-			<span class="n">delayDCR</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">expovariate</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span><span class="o">*</span><span class="mf">1e9</span>
-			<span class="n">dcrTime</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dcrTime</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">delayDCR</span><span class="p">)</span>
-		<span class="n">dcrTime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dcrTime</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-	<span class="k">return</span><span class="p">(</span><span class="n">dcrTime</span><span class="p">)</span></div>
+<span class="sd">    Parameters</span>
+<span class="sd">    ------------</span>
+<span class="sd">    rate : double</span>
+<span class="sd">            Rate of dcr in kHz</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    dcrTime : np.ndarray</span>
+<span class="sd">            Array containing dcr times</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">FASTDCR</span><span class="p">:</span>
+        <span class="n">ndcr</span> <span class="o">=</span> <span class="n">poisson</span><span class="p">(</span><span class="n">rate</span> <span class="o">*</span> <span class="n">SIGLEN</span> <span class="o">*</span> <span class="mf">1e-9</span><span class="p">)</span>  <span class="c1"># Poissonian distribution</span>
+        <span class="c1"># Times uniformly distributed</span>
+        <span class="n">dcrTime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ndcr</span><span class="p">)</span> <span class="o">*</span> <span class="n">SIGLEN</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dcrTime</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">dcrTime</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">SIGLEN</span><span class="p">:</span>  <span class="c1"># Generate from exponential distribution of delays</span>
+            <span class="n">delayDCR</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">expovariate</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e9</span>
+            <span class="n">dcrTime</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dcrTime</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">delayDCR</span><span class="p">)</span>
+        <span class="n">dcrTime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dcrTime</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">dcrTime</span></div>
+
 
 <span class="c1">###FUNCTION TO UPDATE THE SIPM MATRIX ARRAY###</span>
-<div class="viewcode-block" id="SiPMEventAction"><a class="viewcode-back" href="../../structure.html#libs.lib.SiPMEventAction">[docs]</a><span class="k">def</span> <span class="nf">SiPMEventAction</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">xt</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	evtsGen(time,xt)</span>
+<div class="viewcode-block" id="SiPMEventAction"><a class="viewcode-back" href="../../structure.html#libs.lib.SiPMEventAction">[docs]</a><span class="k">def</span> <span class="nf">SiPMEventAction</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">XT</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    evtsGen(time,xt)</span>
 
-<span class="sd">	Function that calculates signal height for each SiPM cell and adds optical crosstalk events.</span>
+<span class="sd">    Function that calculates signal height for each SiPM cell and adds optical crosstalk events.</span>
 
-<span class="sd">	Parameters</span>
-<span class="sd">	----------</span>
-<span class="sd">	time : np.ndarray</span>
-<span class="sd">		Array containing the time at which SiPM cells are fired</span>
-<span class="sd">	xt : double</span>
-<span class="sd">		Value of optical crosstalk probability</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : np.ndarray</span>
+<span class="sd">            Array containing the time at which SiPM cells are fired</span>
+<span class="sd">    XT : double</span>
+<span class="sd">            Value of optical crosstalk probability</span>
 
-<span class="sd">	Returns</span>
-<span class="sd">	-------</span>
-<span class="sd">	evtTimes : np.ndarray(int32)</span>
-<span class="sd">		Array containing the time at wich SiPM cells are fired, including xt events (sorted)</span>
-<span class="sd">	sigH : np.ndarray(float32)</span>
-<span class="sd">		Array containing the pulse height of each fired SiPM cell</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="n">evtTimes</span> <span class="o">=</span> <span class="p">[]</span>
-	<span class="n">sigHtemp</span> <span class="o">=</span> <span class="p">[]</span>
-	<span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">time</span><span class="o">&gt;</span><span class="n">siglen</span><span class="p">)</span><span class="o">|</span><span class="p">(</span><span class="n">time</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">)))</span>
-	<span class="n">n</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">size</span>															<span class="c1"># Number of hitted cells</span>
-	<span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-		<span class="n">idx</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ncell</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>								<span class="c1"># Generate random indexes for each cell to be fired (suppose uniform distribution on sensor surface)</span>
-		<span class="n">time</span> <span class="o">=</span> <span class="p">(</span><span class="n">sort</span><span class="p">(</span><span class="n">time</span><span class="p">)</span><span class="o">/</span><span class="n">sampling</span><span class="p">)</span>										<span class="c1"># Convert times in sampling times units and sort them</span>
-		<span class="k">if</span> <span class="n">fastXT</span><span class="p">:</span>
-			<span class="n">nxt</span> <span class="o">=</span> <span class="n">poisson</span><span class="p">(</span><span class="n">xt</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>												<span class="c1"># Generate number of cross talk events (xt per each cell so n*xt for n cells)</span>
-			<span class="k">if</span> <span class="n">nxt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-				<span class="n">addcells</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="n">cellside</span><span class="p">,</span><span class="n">cellside</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">cellside</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="n">cellside</span><span class="p">,</span><span class="mi">1</span><span class="o">-</span><span class="n">cellside</span><span class="p">,</span><span class="mi">1</span><span class="o">+</span><span class="n">cellside</span><span class="p">)</span>	<span class="c1">#Values to add to change cell for XT (8 adjacent cells)</span>
-				<span class="n">xtidx</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">nxt</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>						<span class="c1"># Indexes of cells triggering xt events</span>
-				<span class="n">xtcells</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="n">xtidx</span><span class="p">]</span>										<span class="c1"># Cell ids triggering xt events</span>
-				<span class="n">xttimes</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">xtidx</span><span class="p">]</span>										<span class="c1"># Times of xt events (same of the cell that generates it)</span>
-				<span class="n">xtcells</span> <span class="o">+=</span> <span class="n">choice</span><span class="p">(</span><span class="n">addcells</span><span class="p">,</span><span class="n">nxt</span><span class="p">)</span>								<span class="c1"># Select neighbouring cells</span>
-				<span class="n">idx</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span><span class="n">xtcells</span><span class="p">))</span>									<span class="c1"># Add XT cells to the list</span>
-				<span class="n">time</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">time</span><span class="p">,</span><span class="n">xttimes</span><span class="p">))</span>								<span class="c1"># Add XT times to the list</span>
-		<span class="k">elif</span> <span class="ow">not</span> <span class="n">fastXT</span><span class="p">:</span>
-			<span class="n">addcells</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="n">cellside</span><span class="p">,</span><span class="n">cellside</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">cellside</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="n">cellside</span><span class="p">,</span><span class="mi">1</span><span class="o">-</span><span class="n">cellside</span><span class="p">,</span><span class="mi">1</span><span class="o">+</span><span class="n">cellside</span><span class="p">)</span>
-			<span class="n">nxt</span> <span class="o">=</span> <span class="n">poisson</span><span class="p">(</span><span class="n">xt</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>												<span class="c1"># Generate number of poisson events per each cell</span>
-			<span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nxt</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>												<span class="c1"># If I have any</span>
-				<span class="n">xtcells</span> <span class="o">=</span> <span class="p">[]</span>
-				<span class="n">xttimes</span> <span class="o">=</span> <span class="p">[]</span>
-				<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>											<span class="c1"># Per each cell add xt as above</span>
-					<span class="k">if</span> <span class="n">nxt</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-						<span class="n">xtcells</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="n">choice</span><span class="p">(</span><span class="n">addcells</span><span class="p">,</span><span class="n">nxt</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
-						<span class="n">xttimes</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">time</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">*</span><span class="n">nxt</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-				<span class="n">idx</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span><span class="n">xtcells</span><span class="p">))</span>
-				<span class="n">time</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">time</span><span class="p">,</span><span class="n">xttimes</span><span class="p">))</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    evtTimes : np.ndarray(int32)</span>
+<span class="sd">            Array containing the time at wich SiPM cells are fired, including xt events (sorted)</span>
+<span class="sd">    sigH : np.ndarray(float32)</span>
+<span class="sd">            Array containing the pulse height of each fired SiPM cell</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">evtTimes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">sigHtemp</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">time</span> <span class="o">&gt;</span> <span class="n">SIGLEN</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)))</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">NCELL</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="p">(</span><span class="n">sort</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">/</span> <span class="n">SAMPLING</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">FASTXT</span><span class="p">:</span>
+            <span class="n">nxt</span> <span class="o">=</span> <span class="n">poisson</span><span class="p">(</span><span class="n">XT</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nxt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">addcells</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="n">CELLSIDE</span><span class="p">,</span> <span class="n">CELLSIDE</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">CELLSIDE</span><span class="p">,</span>
+                            <span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="n">CELLSIDE</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">CELLSIDE</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">CELLSIDE</span><span class="p">)</span>
 
-		<span class="k">if</span> <span class="n">idx</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">idx</span><span class="p">)):</span>											<span class="c1"># If all cells index are different output all times without other iterations</span>
-			<span class="n">evtTimes</span> <span class="o">=</span> <span class="n">time</span>
-			<span class="n">sigH</span> <span class="o">=</span> <span class="n">time</span><span class="o">*</span><span class="mi">0</span><span class="o">+</span><span class="mi">1</span>														<span class="c1"># All signals have height 1</span>
-		<span class="k">else</span><span class="p">:</span>
-			<span class="n">uCells</span><span class="p">,</span><span class="n">uCellsIdx</span><span class="p">,</span><span class="n">uCellsCounts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-			<span class="n">sTimes</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">uCellsIdx</span><span class="p">[</span><span class="n">uCellsCounts</span><span class="o">==</span><span class="mi">1</span><span class="p">]]</span>							<span class="c1"># Times of cells fired once (nothing to do)</span>
-			<span class="n">evtTimes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sTimes</span><span class="p">)</span>												<span class="c1"># Add times of cells fired once</span>
-			<span class="n">sigHtemp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sTimes</span><span class="o">*</span><span class="mi">0</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>											<span class="c1"># Cells fired once have an height of 1</span>
+                <span class="n">xtidx</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">nxt</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+                <span class="n">xtcells</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="n">xtidx</span><span class="p">]</span>
+                <span class="n">xttimes</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">xtidx</span><span class="p">]</span>
+                <span class="n">xtcells</span> <span class="o">+=</span> <span class="n">choice</span><span class="p">(</span><span class="n">addcells</span><span class="p">,</span> <span class="n">nxt</span><span class="p">)</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="n">xtcells</span><span class="p">))</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">time</span><span class="p">,</span> <span class="n">xttimes</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">FASTXT</span><span class="p">:</span>
+            <span class="n">addcells</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="n">CELLSIDE</span><span class="p">,</span> <span class="n">CELLSIDE</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">CELLSIDE</span><span class="p">,</span>
+                        <span class="o">-</span><span class="mi">1</span> <span class="o">+</span> <span class="n">CELLSIDE</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">CELLSIDE</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">CELLSIDE</span><span class="p">)</span>
 
-			<span class="n">mCellIdx</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="n">uCellsIdx</span><span class="p">[</span><span class="n">uCellsCounts</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">]]</span>							<span class="c1"># Idx of cell fired multple times (consider cell recovery)</span>
-			<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mCellIdx</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
-				<span class="n">mCellI</span> <span class="o">=</span> <span class="n">mCellIdx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>											<span class="c1"># Loop on cells fired multiple times</span>
-				<span class="n">mCellT</span> <span class="o">=</span> <span class="n">sort</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="n">idx</span><span class="o">==</span><span class="n">mCellI</span><span class="p">])</span>								<span class="c1"># Times of events in the same cell # TODO: Do I need to sort again?</span>
-				<span class="n">delays</span> <span class="o">=</span> <span class="n">mCellT</span><span class="o">-</span><span class="n">mCellT</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>										<span class="c1"># Delays of events consecutive to the first one (first delay returns 0)</span>
-				<span class="n">h</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delays</span><span class="o">/</span><span class="n">cellrecovery</span><span class="p">)</span>									<span class="c1"># Calculate height of pulses (RC discharge circuit)</span>
-				<span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>														<span class="c1"># First pulse height is one</span>
-				<span class="n">evtTimes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mCellT</span><span class="p">)</span>
-				<span class="n">sigHtemp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
-			<span class="n">evtTimes</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">evtTimes</span><span class="p">)</span>											<span class="c1"># Stack al times and heights of signals</span>
-			<span class="n">sigH</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">sigHtemp</span><span class="p">)</span>
-	<span class="k">else</span><span class="p">:</span>
-		<span class="n">evtTimes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>													<span class="c1"># If signal has 0 pe and 0 dcr pass an empty array</span>
-		<span class="n">sigH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-	<span class="k">return</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">evtTimes</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigH</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">))</span></div>
+            <span class="n">nxt</span> <span class="o">=</span> <span class="n">poisson</span><span class="p">(</span><span class="n">XT</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">nxt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">xtcells</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">xttimes</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">nxt</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">xtcells</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">choice</span><span class="p">(</span><span class="n">addcells</span><span class="p">,</span> <span class="n">nxt</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                        <span class="n">xttimes</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">time</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">*</span> <span class="n">nxt</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="n">xtcells</span><span class="p">))</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">((</span><span class="n">time</span><span class="p">,</span> <span class="n">xttimes</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">idx</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">idx</span><span class="p">)):</span>
+            <span class="n">evtTimes</span> <span class="o">=</span> <span class="n">time</span>
+            <span class="n">sigH</span> <span class="o">=</span> <span class="n">time</span> <span class="o">*</span> <span class="mi">0</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">uCellsIdx</span><span class="p">,</span> <span class="n">uCellsCounts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Times of cells fired once</span>
+            <span class="n">sTimes</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="n">uCellsIdx</span><span class="p">[</span><span class="n">uCellsCounts</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="n">evtTimes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sTimes</span><span class="p">)</span>
+            <span class="n">sigHtemp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sTimes</span> <span class="o">*</span> <span class="mi">0</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Idx of cell fired multple times</span>
+            <span class="n">mCellIdx</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="n">uCellsIdx</span><span class="p">[</span><span class="n">uCellsCounts</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mCellIdx</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                <span class="n">mCellI</span> <span class="o">=</span> <span class="n">mCellIdx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>    <span class="c1"># Loop on cells fired multiple times</span>
+                <span class="c1"># Times of events in the same cell</span>
+                <span class="n">mCellT</span> <span class="o">=</span> <span class="n">sort</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="n">idx</span> <span class="o">==</span> <span class="n">mCellI</span><span class="p">])</span>
+                <span class="c1"># Delays of events consecutive to the first</span>
+                <span class="n">delays</span> <span class="o">=</span> <span class="n">mCellT</span> <span class="o">-</span> <span class="n">mCellT</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># Calculate height of pulses</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delays</span> <span class="o">/</span> <span class="n">CELLRECOVERY</span><span class="p">)</span>
+                <span class="n">h</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">evtTimes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mCellT</span><span class="p">)</span>
+                <span class="n">sigHtemp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+            <span class="n">evtTimes</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">evtTimes</span><span class="p">)</span>
+            <span class="n">sigH</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">(</span><span class="n">sigHtemp</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If signal has 0 pe and 0 dcr pass an empty array</span>
+        <span class="n">evtTimes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sigH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">Graphics</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">evtTimes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigH</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">),</span> <span class="n">idx</span><span class="p">)</span></div>
+
 
 <span class="c1">### GENERATION OF SIGNALS SHAPES FAST ###</span>
-<span class="k">if</span> <span class="kc">True</span><span class="p">:</span><span class="c1">#args.signal is None:											# If generating signals fast (default)</span>
-	<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">sigpts</span><span class="p">)</span>
-	<span class="n">signalmodel</span> <span class="o">=</span> <span class="n">signalgenfortran</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">tfall</span><span class="p">,</span><span class="n">trise</span><span class="p">,</span><span class="n">sigpts</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>	<span class="c1"># Define the model of my signal (calculate it only once)</span>
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span><span class="c1">#args.signal is None:  # If generating signals fast (default)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">SIGPTS</span><span class="p">)</span>
+<span class="c1"># Define the model of my signal (calculate it only once)</span>
+    <span class="n">signalmodel</span> <span class="o">=</span> <span class="n">signalgenfortran</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">TFALL</span><span class="p">,</span> <span class="n">TRISE</span><span class="p">,</span> <span class="n">SIGPTS</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">SiPMSignalAction</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">sigH</span><span class="p">,</span> <span class="n">SNR</span><span class="p">,</span> <span class="n">BASESPREAD</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        signalGen(times,sigH,SNR,basespread)</span>
 
-<div class="viewcode-block" id="SiPMSignalAction"><a class="viewcode-back" href="../../structure.html#libs.lib.SiPMSignalAction">[docs]</a>	<span class="k">def</span> <span class="nf">SiPMSignalAction</span><span class="p">(</span><span class="n">times</span><span class="p">,</span><span class="n">sigH</span><span class="p">,</span><span class="n">SNR</span><span class="p">,</span><span class="n">basespread</span><span class="p">):</span>							<span class="c1"># Function that passes signals times and height to main function for generating signals</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		signalGen(times,sigH,SNR,basespread)</span>
+<span class="sd">        Function that passes signal height and times to the main function that</span>
+<span class="sd">        generates single signals. Also adds noise.</span>
 
-<span class="sd">		Function that passes signal height and times to the main function that generates single signals. Also adds noise.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        times : np.ndarray(int32)</span>
+<span class="sd">                Array containing the time at wich SiPM cells are fired, including xt events (sorted)</span>
+<span class="sd">        sigH : np.ndarray(float32)</span>
+<span class="sd">                Array containing the pulse height of each fired SiPM cell</span>
+<span class="sd">        SNR : double</span>
+<span class="sd">                The signal to noise ratio of the noise to add</span>
+<span class="sd">        basespread : double</span>
+<span class="sd">                Sigma of the value to add as baseline</span>
 
-<span class="sd">		Parameters</span>
-<span class="sd">		----------</span>
-<span class="sd">		times : np.ndarray(int32)</span>
-<span class="sd">			Array containing the time at wich SiPM cells are fired, including xt events (sorted)</span>
-<span class="sd">		sigH : np.ndarray(float32)</span>
-<span class="sd">			Array containing the pulse height of each fired SiPM cell</span>
-<span class="sd">		SNR : double</span>
-<span class="sd">			The signal to noise ratio of the noise to add</span>
-<span class="sd">		basespread : double</span>
-<span class="sd">			Sigma of the value to add as baseline</span>
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        signal : np.ndarray</span>
+<span class="sd">                Array containing the generated SiPM signal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">baseline</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">BASESPREAD</span><span class="p">)</span>  <span class="c1"># Add a baseline</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">SNR</span><span class="p">,</span> <span class="n">SIGPTS</span><span class="p">)</span>    <span class="c1"># Start with gaussian noise</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">times</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>   <span class="c1"># Generate signals and sum them</span>
+            <span class="n">signal</span> <span class="o">+=</span> <span class="n">PulseCPU</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sigH</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">signal</span>
 
-<span class="sd">		Returns</span>
-<span class="sd">		--------</span>
-<span class="sd">		signal : np.ndarray</span>
-<span class="sd">			Array containing the generated SiPM signal</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">baseline</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">basespread</span><span class="p">)</span>					<span class="c1"># Add a baseline to the signal (gaussian distribution)</span>
-		<span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span><span class="n">SNR</span><span class="p">,</span><span class="n">sigpts</span><span class="p">)</span>			<span class="c1"># Start with gaussian noise</span>
-		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">times</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>								<span class="c1"># Generate signals and sum them</span>
-			<span class="n">signal</span> <span class="o">+=</span> <span class="n">PulseCPU</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">sigH</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>				<span class="c1"># Generate signals</span>
-		<span class="k">return</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">PulseCPU</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        PulseCPU(t,h)</span>
 
-<div class="viewcode-block" id="PulseCPU"><a class="viewcode-back" href="../../structure.html#libs.lib.PulseCPU">[docs]</a>	<span class="k">def</span> <span class="nf">PulseCPU</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">h</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		PulseCPU(t,h)</span>
+<span class="sd">        Function that generates the signal from a single SiPM cell.</span>
+<span class="sd">        This is the &quot;fast&quot; version that uses a pre-computed signal</span>
+<span class="sd">        shape and translates it in time.</span>
 
-<span class="sd">		Function that generates the signal from a single SiPM cell. This is the &quot;fast&quot; version that uses a pre-computed signal shape and translates it in time.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : int32</span>
+<span class="sd">                Time at which the cell is triggered</span>
+<span class="sd">        h : float32</span>
+<span class="sd">                The relative pulse height of the cell signal</span>
 
-<span class="sd">		Parameters</span>
-<span class="sd">		----------</span>
-<span class="sd">		t : int32</span>
-<span class="sd">			Time at which the cell is triggered</span>
-<span class="sd">		h : float32</span>
-<span class="sd">			The relative pulse height of the cell signal</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        s : np.ndarray</span>
+<span class="sd">                Array containing the generated cell signal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gainvar</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">CCGV</span><span class="p">)</span>    <span class="c1"># Each signal has a ccgv</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">rollfortran</span><span class="p">(</span><span class="n">signalmodel</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">gainvar</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">SIGPTS</span><span class="p">)</span>   <span class="c1"># Move the model signal</span>
+        <span class="n">nap</span> <span class="o">=</span> <span class="n">poisson</span><span class="p">(</span><span class="n">AP</span><span class="p">)</span>  <span class="c1"># Generate number of afterpulses</span>
+        <span class="k">if</span> <span class="n">nap</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nap</span><span class="p">):</span>
+                <span class="c1"># APs have a time delay exponential distribution</span>
+                <span class="n">apdel</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">expovariate</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">TAUAPFAST</span><span class="p">)</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">expovariate</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">TAUAPSLOW</span><span class="p">)</span>
+                <span class="n">tap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">apdel</span> <span class="o">/</span> <span class="n">SAMPLING</span> <span class="o">+</span> <span class="n">t</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">tap</span> <span class="o">&lt;</span> <span class="n">SIGPTS</span><span class="p">:</span>
+                    <span class="c1"># Generate ap signal height as an RC circuit</span>
+                    <span class="n">hap</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">apdel</span> <span class="o">/</span> <span class="n">CELLRECOVERY</span><span class="p">)</span>
+                    <span class="n">sap</span> <span class="o">=</span> <span class="n">rollfortran</span><span class="p">(</span><span class="n">signalmodel</span><span class="p">,</span> <span class="n">tap</span><span class="p">,</span> <span class="n">gainvar</span><span class="p">,</span> <span class="n">hap</span><span class="p">,</span> <span class="n">SIGPTS</span><span class="p">)</span>
+                    <span class="n">sig</span> <span class="o">+=</span> <span class="n">sap</span>       <span class="c1"># Add each ap</span>
+        <span class="k">return</span> <span class="n">sig</span>
 
-<span class="sd">		Returns</span>
-<span class="sd">		-------</span>
-<span class="sd">		s : np.ndarray</span>
-<span class="sd">			Array containing the generated cell signal</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">gainvar</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ccgv</span><span class="p">)</span>							<span class="c1"># Each signal has a cell to cell gain variation</span>
-		<span class="n">s</span> <span class="o">=</span> <span class="n">rollfortran</span><span class="p">(</span><span class="n">signalmodel</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">gainvar</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="n">sigpts</span><span class="p">)</span>			<span class="c1"># Move the model signal at the appropriate time</span>
-		<span class="n">nap</span> <span class="o">=</span> <span class="n">poisson</span><span class="p">(</span><span class="n">ap</span><span class="p">)</span>										<span class="c1"># Generate number of afterpulses</span>
-		<span class="k">if</span> <span class="n">nap</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-			<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nap</span><span class="p">):</span>
-				<span class="n">apdel</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">expovariate</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">tauapfast</span><span class="p">)</span><span class="o">+</span><span class="n">random</span><span class="o">.</span><span class="n">expovariate</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">tauapslow</span><span class="p">)</span>		<span class="c1"># APs have a time delay exponential distribution</span>
-				<span class="n">tap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">apdel</span><span class="o">/</span><span class="n">sampling</span><span class="o">+</span><span class="n">t</span><span class="p">)</span>											<span class="c1"># Each afterpulse has a delay from its &quot;main&quot; signal that follows a exp distribution</span>
-				<span class="k">if</span> <span class="n">tap</span><span class="o">&lt;</span><span class="n">siglen</span><span class="p">:</span>
-					<span class="n">hap</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">apdel</span><span class="o">/</span><span class="n">tfall</span><span class="p">)</span>													<span class="c1"># Generate ap signal height as an RC circuit</span>
-					<span class="n">sap</span> <span class="o">=</span> <span class="n">rollfortran</span><span class="p">(</span><span class="n">signalmodel</span><span class="p">,</span><span class="n">tap</span><span class="p">,</span><span class="n">gainvar</span><span class="p">,</span><span class="n">hap</span><span class="p">,</span><span class="n">sigpts</span><span class="p">)</span>									<span class="c1"># Generate ap signal as above</span>
-					<span class="n">s</span> <span class="o">+=</span> <span class="n">sap</span>																	<span class="c1"># Add each ap</span>
-		<span class="k">return</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
 
 <span class="c1">### FULL GENERATION OF SIGNAL SHAPES ###</span>
-<span class="k">else</span><span class="p">:</span>												<span class="c1"># In this case recalculate the signal each time</span>
-	<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s1">&#39;cpu&#39;</span><span class="p">:</span>
-		<span class="kn">from</span> <span class="nn">libs.libCPU</span> <span class="kn">import</span> <span class="o">*</span>					<span class="c1"># Generation fully on cpu</span>
-	<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="s1">&#39;gpu&#39;</span><span class="p">:</span>
-		<span class="kn">from</span> <span class="nn">libs.libGPU</span> <span class="kn">import</span> <span class="o">*</span>					<span class="c1"># Generation on cpu for low light and cpu for high light</span>
+<span class="k">else</span><span class="p">:</span>								<span class="c1"># Recalculate the signal each time</span>
+    <span class="k">if</span> <span class="kc">True</span><span class="p">:</span><span class="c1">#args.device == &#39;cpu&#39;:</span>
+        <span class="kn">from</span> <span class="nn">libs.libCPU</span> <span class="kn">import</span> <span class="o">*</span>   <span class="c1"># Generation fully on cpu</span>
+    <span class="k">if</span> <span class="kc">True</span><span class="p">:</span><span class="c1">#args.device == &#39;gpu&#39;:</span>
+        <span class="kn">from</span> <span class="nn">libs.libGPU</span> <span class="kn">import</span> <span class="o">*</span>   <span class="c1"># Cpu for low light and cpu for high light</span>
 
 <span class="c1">###SOME STATISCTICS AT END OF SCRIPT###</span>
+
+
 <div class="viewcode-block" id="somestats"><a class="viewcode-back" href="../../structure.html#libs.lib.somestats">[docs]</a><span class="k">def</span> <span class="nf">somestats</span><span class="p">(</span><span class="n">output</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	somestats(output)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    somestats(output)</span>
 
-<span class="sd">	Function that displays histograms of generated events</span>
+<span class="sd">    Function that displays histograms of generated events</span>
 
-<span class="sd">	Parameters</span>
-<span class="sd">	----------</span>
-<span class="sd">	output : np.ndarray</span>
-<span class="sd">		Array containing output of the simulation. This array contains the integral, peak and starting time in the first three columns.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    output : np.ndarray</span>
+<span class="sd">            Array containing output of the simulation.</span>
+<span class="sd">            This array contains the integral,</span>
+<span class="sd">            peak and starting time in the first three columns.</span>
 
-<span class="sd">	Note</span>
-<span class="sd">	-----</span>
-<span class="sd">	See docs for a detailed description of integral, peak and tstart</span>
-<span class="sd">	&quot;&quot;&quot;</span>
+<span class="sd">    Note</span>
+<span class="sd">    -----</span>
+<span class="sd">    See docs for a detailed description of integral, peak and tstart</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-	<span class="n">integral</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
-	<span class="n">peak</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
-	<span class="n">tstart</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
-	<span class="n">other</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">integral</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">peak</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">tstart</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">tovert</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="n">tpeak</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span>
+    <span class="n">other</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]</span>
 
-	<span class="n">ROOT</span><span class="o">.</span><span class="n">gStyle</span><span class="o">.</span><span class="n">SetOptStat</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-	<span class="n">ROOT</span><span class="o">.</span><span class="n">gStyle</span><span class="o">.</span><span class="n">SetOptFit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-	<span class="n">ROOT</span><span class="o">.</span><span class="n">gStyle</span><span class="o">.</span><span class="n">SetTitleXSize</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
-	<span class="n">ROOT</span><span class="o">.</span><span class="n">gStyle</span><span class="o">.</span><span class="n">SetTitleYSize</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
-	<span class="n">ROOT</span><span class="o">.</span><span class="n">gStyle</span><span class="o">.</span><span class="n">SetTitleXOffset</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
-	<span class="n">ROOT</span><span class="o">.</span><span class="n">gStyle</span><span class="o">.</span><span class="n">SetTitleYOffset</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
-	<span class="n">c1</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c1&#39;</span><span class="p">,</span><span class="s1">&#39;Histogram&#39;</span><span class="p">,</span><span class="mi">600</span><span class="p">,</span><span class="mi">400</span><span class="p">)</span>
-	<span class="n">c2</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c2&#39;</span><span class="p">,</span><span class="s1">&#39;Histogram&#39;</span><span class="p">,</span><span class="mi">600</span><span class="p">,</span><span class="mi">400</span><span class="p">)</span>
-	<span class="n">c3</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c3&#39;</span><span class="p">,</span><span class="s1">&#39;Histogram&#39;</span><span class="p">,</span><span class="mi">600</span><span class="p">,</span><span class="mi">400</span><span class="p">)</span>
-	<span class="n">c4</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c4&#39;</span><span class="p">,</span><span class="s1">&#39;Histogram&#39;</span><span class="p">,</span><span class="mi">600</span><span class="p">,</span><span class="mi">400</span><span class="p">)</span>
-	<span class="n">c5</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c5&#39;</span><span class="p">,</span><span class="s1">&#39;Cumulatives&#39;</span><span class="p">,</span><span class="mi">600</span><span class="p">,</span><span class="mi">400</span><span class="p">)</span>
+    <span class="n">ROOT</span><span class="o">.</span><span class="n">gROOT</span><span class="o">.</span><span class="n">SetStyle</span><span class="p">(</span><span class="s2">&quot;ATLAS&quot;</span><span class="p">)</span>
+    <span class="n">ROOT</span><span class="o">.</span><span class="n">gStyle</span><span class="o">.</span><span class="n">SetOptStat</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ROOT</span><span class="o">.</span><span class="n">gStyle</span><span class="o">.</span><span class="n">SetOptFit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ROOT</span><span class="o">.</span><span class="n">gStyle</span><span class="o">.</span><span class="n">SetHistFillColor</span><span class="p">(</span><span class="mi">603</span><span class="p">)</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c1&#39;</span><span class="p">,</span> <span class="s1">&#39;Histogram&#39;</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c2&#39;</span><span class="p">,</span> <span class="s1">&#39;Histogram&#39;</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="n">c3</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c3&#39;</span><span class="p">,</span> <span class="s1">&#39;Histogram&#39;</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="n">c4</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c4&#39;</span><span class="p">,</span> <span class="s1">&#39;Histogram&#39;</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="n">c5</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c5&#39;</span><span class="p">,</span> <span class="s1">&#39;Staircase&#39;</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="n">c6</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c6&#39;</span><span class="p">,</span> <span class="s1">&#39;Histogram&#39;</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="n">c7</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TCanvas</span><span class="p">(</span><span class="s1">&#39;c7&#39;</span><span class="p">,</span> <span class="s1">&#39;Histogram&#39;</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
 
-	<span class="n">h1</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TH1F</span><span class="p">(</span><span class="s1">&#39;Integral&#39;</span><span class="p">,</span><span class="s1">&#39;Integrals&#39;</span><span class="p">,</span><span class="mi">750</span><span class="p">,</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="nb">max</span><span class="p">(</span><span class="n">integral</span><span class="p">))</span>
-	<span class="n">h1</span><span class="o">.</span><span class="n">SetXTitle</span><span class="p">(</span><span class="s1">&#39;Integral&#39;</span><span class="p">)</span>
-	<span class="n">h2</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TH1F</span><span class="p">(</span><span class="s1">&#39;Peak Value&#39;</span><span class="p">,</span><span class="s1">&#39;Peaks&#39;</span><span class="p">,</span><span class="mi">750</span><span class="p">,</span><span class="o">-</span><span class="mf">0.25</span><span class="p">,</span><span class="nb">max</span><span class="p">(</span><span class="n">peak</span><span class="p">))</span>
-	<span class="n">h2</span><span class="o">.</span><span class="n">SetXTitle</span><span class="p">(</span><span class="s1">&#39;Peak&#39;</span><span class="p">)</span>
-	<span class="n">nbin</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">tstart</span><span class="p">[</span><span class="n">tstart</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">tstart</span><span class="p">[</span><span class="n">tstart</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="n">sampling</span>
-	<span class="n">h3</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TH1F</span><span class="p">(</span><span class="s1">&#39;Starting Time&#39;</span><span class="p">,</span><span class="s1">&#39;Tstart&#39;</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nbin</span><span class="p">),</span><span class="nb">min</span><span class="p">(</span><span class="n">tstart</span><span class="p">[</span><span class="n">tstart</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]),</span><span class="nb">max</span><span class="p">(</span><span class="n">tstart</span><span class="p">[</span><span class="n">tstart</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">]))</span>
-	<span class="n">h3</span><span class="o">.</span><span class="n">SetXTitle</span><span class="p">(</span><span class="s1">&#39;Time [ns]&#39;</span><span class="p">)</span>
-	<span class="n">h4</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TH2F</span><span class="p">(</span><span class="s1">&#39;Histogram&#39;</span><span class="p">,</span><span class="s1">&#39;PvsI&#39;</span><span class="p">,</span><span class="mi">300</span><span class="p">,</span><span class="nb">min</span><span class="p">(</span><span class="n">peak</span><span class="p">),</span><span class="nb">max</span><span class="p">(</span><span class="n">peak</span><span class="p">),</span><span class="mi">300</span><span class="p">,</span><span class="nb">min</span><span class="p">(</span><span class="n">integral</span><span class="p">),</span><span class="nb">max</span><span class="p">(</span><span class="n">integral</span><span class="p">))</span>
-	<span class="p">[</span><span class="n">h1</span><span class="o">.</span><span class="n">Fill</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">integral</span><span class="p">]</span>
-	<span class="p">[</span><span class="n">h2</span><span class="o">.</span><span class="n">Fill</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">peak</span><span class="p">]</span>
-	<span class="p">[</span><span class="n">h3</span><span class="o">.</span><span class="n">Fill</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tstart</span><span class="p">]</span>
-	<span class="p">[</span><span class="n">h4</span><span class="o">.</span><span class="n">Fill</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">peak</span><span class="p">,</span><span class="n">integral</span><span class="p">)]</span>
-	<span class="n">c1</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
-	<span class="n">h1</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;C PLC&quot;</span><span class="p">)</span>
-	<span class="n">c2</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
-	<span class="n">h2</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;C PLC&quot;</span><span class="p">)</span>
-	<span class="n">c3</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
-	<span class="n">h3</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;E&quot;</span><span class="p">)</span>
-	<span class="n">c4</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
-	<span class="n">h4</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;cont4z&quot;</span><span class="p">)</span>
-	<span class="n">c5</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
-	<span class="n">h1_C</span> <span class="o">=</span> <span class="n">h1</span><span class="o">.</span><span class="n">GetCumulative</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span><span class="s1">&#39; Cumulative&#39;</span><span class="p">)</span>
-	<span class="n">h2_C</span> <span class="o">=</span> <span class="n">h2</span><span class="o">.</span><span class="n">GetCumulative</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span><span class="s1">&#39; Cumulative&#39;</span><span class="p">)</span>
-	<span class="n">h1_C</span><span class="o">.</span><span class="n">SetLineColor</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-	<span class="n">h1_C</span><span class="o">.</span><span class="n">SetTitle</span><span class="p">(</span><span class="s1">&#39;Cumulative histogram of integral&#39;</span><span class="p">)</span>
-	<span class="n">h1_C</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
+    <span class="n">h1</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TH1F</span><span class="p">(</span><span class="s1">&#39;Integral&#39;</span><span class="p">,</span> <span class="s1">&#39;Integral&#39;</span><span class="p">,</span> <span class="mi">750</span><span class="p">,</span> <span class="n">integral</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">integral</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">h1</span><span class="o">.</span><span class="n">SetXTitle</span><span class="p">(</span><span class="s1">&#39;Integral [A.U.]&#39;</span><span class="p">)</span>
+    <span class="n">h1</span><span class="o">.</span><span class="n">SetYTitle</span><span class="p">(</span><span class="s1">&#39;Entries&#39;</span><span class="p">)</span>
+    <span class="n">h2</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TH1F</span><span class="p">(</span><span class="s1">&#39;Peak Value&#39;</span><span class="p">,</span> <span class="s1">&#39;Peak&#39;</span><span class="p">,</span> <span class="mi">750</span><span class="p">,</span> <span class="n">peak</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">peak</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">h2</span><span class="o">.</span><span class="n">SetXTitle</span><span class="p">(</span><span class="s1">&#39;Peak [A.U.]&#39;</span><span class="p">)</span>
+    <span class="n">h2</span><span class="o">.</span><span class="n">SetYTitle</span><span class="p">(</span><span class="s1">&#39;Entries&#39;</span><span class="p">)</span>
+    <span class="n">inf</span> <span class="o">=</span> <span class="n">tstart</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    <span class="n">sup</span> <span class="o">=</span> <span class="n">tstart</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">n_bin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">sup</span> <span class="o">-</span> <span class="n">inf</span><span class="p">)</span> <span class="o">/</span> <span class="n">SAMPLING</span><span class="p">)</span>
+    <span class="n">h3</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TH1F</span><span class="p">(</span><span class="s1">&#39;Starting Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Tstart&#39;</span><span class="p">,</span> <span class="n">n_bin</span><span class="p">,</span> <span class="n">inf</span><span class="p">,</span> <span class="n">sup</span><span class="p">)</span>
+    <span class="n">h3</span><span class="o">.</span><span class="n">SetXTitle</span><span class="p">(</span><span class="s1">&#39;Starting Time [ns]&#39;</span><span class="p">)</span>
+    <span class="n">h4</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TH2F</span><span class="p">(</span><span class="s1">&#39;Histogram&#39;</span><span class="p">,</span> <span class="s1">&#39;Peak - Integral&#39;</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">peak</span><span class="p">),</span><span class="nb">max</span><span class="p">(</span><span class="n">peak</span><span class="p">),</span> <span class="mi">200</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">integral</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">integral</span><span class="p">))</span>
+    <span class="n">h4</span><span class="o">.</span><span class="n">SetXTitle</span><span class="p">(</span><span class="s1">&#39;Peak [A.U.]&#39;</span><span class="p">)</span>
+    <span class="n">h4</span><span class="o">.</span><span class="n">SetYTitle</span><span class="p">(</span><span class="s1">&#39;Integral [A.U.]&#39;</span><span class="p">)</span>
+    <span class="n">inf</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sup</span> <span class="o">=</span> <span class="n">tovert</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">n_bin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">sup</span> <span class="o">-</span> <span class="n">inf</span><span class="p">)</span> <span class="o">/</span> <span class="n">SAMPLING</span><span class="p">)</span>
+    <span class="n">h5</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TH1F</span><span class="p">(</span><span class="s1">&#39;ToT&#39;</span><span class="p">,</span> <span class="s1">&#39;Time over threshld&#39;</span><span class="p">,</span> <span class="n">n_bin</span><span class="p">,</span> <span class="n">inf</span><span class="p">,</span> <span class="n">sup</span><span class="p">)</span>
+    <span class="n">h5</span><span class="o">.</span><span class="n">SetXTitle</span><span class="p">(</span><span class="s1">&#39;Time [ns]&#39;</span><span class="p">)</span>
+    <span class="n">h5</span><span class="o">.</span><span class="n">SetYTitle</span><span class="p">(</span><span class="s1">&#39;Entries&#39;</span><span class="p">)</span>
+    <span class="n">inf</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sup</span> <span class="o">=</span> <span class="n">tpeak</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">n_bin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">sup</span> <span class="o">-</span> <span class="n">inf</span><span class="p">)</span> <span class="o">/</span> <span class="n">SAMPLING</span><span class="p">)</span>
+    <span class="n">h6</span> <span class="o">=</span> <span class="n">ROOT</span><span class="o">.</span><span class="n">TH1F</span><span class="p">(</span><span class="s1">&#39;ToP&#39;</span><span class="p">,</span> <span class="s1">&#39;Time of peak&#39;</span><span class="p">,</span> <span class="n">n_bin</span><span class="p">,</span> <span class="n">inf</span><span class="p">,</span> <span class="n">sup</span><span class="p">)</span>
+    <span class="n">h6</span><span class="o">.</span><span class="n">SetXTitle</span><span class="p">(</span><span class="s1">&#39;Time [ns]&#39;</span><span class="p">)</span>
+    <span class="n">h6</span><span class="o">.</span><span class="n">SetYTitle</span><span class="p">(</span><span class="s1">&#39;Entries&#39;</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">h1</span><span class="o">.</span><span class="n">Fill</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">integral</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">h2</span><span class="o">.</span><span class="n">Fill</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">peak</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">h3</span><span class="o">.</span><span class="n">Fill</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tstart</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">h4</span><span class="o">.</span><span class="n">Fill</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">peak</span><span class="p">,</span> <span class="n">integral</span><span class="p">)]</span>
+    <span class="p">[</span><span class="n">h5</span><span class="o">.</span><span class="n">Fill</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tovert</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">h6</span><span class="o">.</span><span class="n">Fill</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tpeak</span><span class="p">]</span>
+    <span class="n">c1</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
+    <span class="n">h1</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;bar9&quot;</span><span class="p">)</span>
+    <span class="n">c2</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
+    <span class="n">h2</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;bar9&quot;</span><span class="p">)</span>
+    <span class="n">c3</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
+    <span class="n">h3</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;E9&quot;</span><span class="p">)</span>
+    <span class="n">c4</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
+    <span class="n">h4</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;colz&quot;</span><span class="p">)</span>
+    <span class="n">c5</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
+    <span class="n">c5</span><span class="o">.</span><span class="n">SetLogy</span><span class="p">()</span>
+    <span class="n">staircase</span> <span class="o">=</span> <span class="n">h2</span><span class="o">.</span><span class="n">GetCumulative</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39; Staircase&#39;</span><span class="p">)</span>
+    <span class="n">staircase</span><span class="o">.</span><span class="n">Scale</span><span class="p">(</span><span class="mf">1e-3</span> <span class="o">/</span> <span class="n">h2</span><span class="o">.</span><span class="n">Integral</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="n">INTGATE</span> <span class="o">*</span> <span class="n">SAMPLING</span> <span class="o">*</span> <span class="mf">1e-9</span><span class="p">))</span>
+    <span class="n">staircase</span><span class="o">.</span><span class="n">SetLineColor</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">staircase</span><span class="o">.</span><span class="n">SetTitle</span><span class="p">(</span><span class="s1">&#39;Staircase&#39;</span><span class="p">)</span>
+    <span class="n">staircase</span><span class="o">.</span><span class="n">SetXTitle</span><span class="p">(</span><span class="s1">&#39;Peak [A.U.]&#39;</span><span class="p">)</span>
+    <span class="n">staircase</span><span class="o">.</span><span class="n">SetYTitle</span><span class="p">(</span><span class="s1">&#39;Rate [kHz]&#39;</span><span class="p">)</span>
+    <span class="n">staircase</span><span class="o">.</span><span class="n">SetFillColor</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">staircase</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;hist9&quot;</span><span class="p">)</span>
+    <span class="n">c6</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
+    <span class="n">h5</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;bar9&quot;</span><span class="p">)</span>
+    <span class="n">c7</span><span class="o">.</span><span class="n">cd</span><span class="p">()</span>
+    <span class="n">h6</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="s2">&quot;bar9&quot;</span><span class="p">)</span>
+    <span class="n">c1</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+    <span class="n">c2</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+    <span class="n">c3</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+    <span class="n">c4</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+    <span class="n">c5</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+    <span class="n">c6</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+    <span class="n">c7</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+    <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Press &lt;RET&gt; to continue...&#39;</span><span class="p">)</span>
+    <span class="k">return</span></div>
 
-	<span class="n">c1</span><span class="o">.</span><span class="n">Update</span><span class="p">();</span><span class="n">c2</span><span class="o">.</span><span class="n">Update</span><span class="p">();</span><span class="n">c3</span><span class="o">.</span><span class="n">Update</span><span class="p">();</span><span class="n">c4</span><span class="o">.</span><span class="n">Update</span><span class="p">();</span><span class="n">c5</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
-	<span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Press &lt;RET&gt; to continue...&#39;</span><span class="p">)</span>
-	<span class="k">return</span></div>
 
-<span class="n">drawn</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span><span class="o">*</span><span class="mi">0</span><span class="c1">#nJobs</span>
-<div class="viewcode-block" id="sigPlot"><a class="viewcode-back" href="../../structure.html#libs.lib.sigPlot">[docs]</a><span class="k">def</span> <span class="nf">sigPlot</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span><span class="n">sigTimes</span><span class="p">,</span><span class="n">dcrTime</span><span class="p">,</span><span class="n">dev</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	sigPlot(signal,sigTimes,dcrTime,dev)</span>
+<span class="c1"># drawn = [False] * nJobs</span>
+<div class="viewcode-block" id="sigPlot"><a class="viewcode-back" href="../../structure.html#libs.lib.sigPlot">[docs]</a><span class="k">def</span> <span class="nf">sigPlot</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">sigTimes</span><span class="p">,</span> <span class="n">dcrTime</span><span class="p">,</span> <span class="n">dev</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sigPlot(signal,sigTimes,dcrTime,dev)</span>
 
-<span class="sd">	Function that plots each signal pulse produced in the simulation.</span>
+<span class="sd">    Function that plots each signal pulse produced in the simulation.</span>
 
-<span class="sd">	Parameters</span>
-<span class="sd">	-----------</span>
-<span class="sd">	signal : np.ndarray</span>
-<span class="sd">		Array containing the generated SiPM signal</span>
-<span class="sd">	sigTimes : np.ndarray</span>
-<span class="sd">		Array containing all photons events times (including xt)</span>
-<span class="sd">	dcrTime : np.ndarray</span>
-<span class="sd">		Array containing dcr events times</span>
-<span class="sd">	dev : str</span>
-<span class="sd">		String that describes the device on which the signal is computed</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="n">current_core</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
-	<span class="k">if</span> <span class="n">current_core</span><span class="o">==</span><span class="s1">&#39;MainProcess&#39;</span><span class="p">:</span>
-		<span class="n">current_core</span> <span class="o">=</span> <span class="mi">0</span>
-	<span class="k">else</span><span class="p">:</span>
-		<span class="n">current_core</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">current_core</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span>
-	<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-	<span class="k">if</span> <span class="ow">not</span> <span class="n">drawn</span><span class="p">[</span><span class="n">current_core</span><span class="p">]:</span>
-		<span class="n">screenx</span> <span class="o">=</span> <span class="mi">1920</span><span class="p">;</span> <span class="n">screeny</span> <span class="o">=</span> <span class="mi">1080</span><span class="p">;</span>
-		<span class="n">xsize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screenx</span><span class="o">/</span><span class="mi">6</span><span class="p">);</span> <span class="n">ysize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screeny</span><span class="o">/</span><span class="mi">3</span><span class="p">);</span>
-		<span class="n">xpos</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_core</span><span class="o">%</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="n">xsize</span>
-		<span class="n">ypos</span> <span class="o">=</span> <span class="p">((</span><span class="n">current_core</span><span class="o">//</span><span class="mi">6</span><span class="p">)</span><span class="o">%</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">ysize</span>
-		<span class="n">plt</span><span class="o">.</span><span class="n">get_current_fig_manager</span><span class="p">()</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="n">xpos</span><span class="p">,</span><span class="n">ypos</span><span class="p">,</span><span class="n">xsize</span><span class="p">,</span><span class="n">ysize</span><span class="p">)</span>
-		<span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">intstart</span><span class="o">*</span><span class="n">sampling</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-		<span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">intstart</span><span class="o">*</span><span class="n">sampling</span><span class="p">,</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-		<span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">((</span><span class="n">intstart</span><span class="o">-</span><span class="n">preg</span><span class="p">)</span><span class="o">*</span><span class="n">sampling</span><span class="p">,</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-		<span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">intstart</span><span class="o">*</span><span class="n">sampling</span><span class="p">,(</span><span class="n">intstart</span><span class="o">+</span><span class="n">intgate</span><span class="p">)</span><span class="o">*</span><span class="n">sampling</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-		<span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">((</span><span class="n">intstart</span><span class="o">+</span><span class="n">intgate</span><span class="p">)</span><span class="o">*</span><span class="n">sampling</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-		<span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,(</span><span class="n">intstart</span><span class="o">+</span><span class="n">intgate</span><span class="p">)</span><span class="o">*</span><span class="n">sampling</span><span class="p">,</span><span class="n">siglen</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-		<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
-		<span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">integer</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-		<span class="n">drawn</span><span class="p">[</span><span class="n">current_core</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-		<span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.075</span><span class="p">,</span><span class="n">right</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span><span class="n">top</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span><span class="n">bottom</span><span class="o">=</span><span class="mf">0.075</span><span class="p">)</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    -----------</span>
+<span class="sd">    signal : np.ndarray</span>
+<span class="sd">            Array containing the generated SiPM signal</span>
+<span class="sd">    sigTimes : np.ndarray</span>
+<span class="sd">            Array containing all photons events times (including xt)</span>
+<span class="sd">    dcrTime : np.ndarray</span>
+<span class="sd">            Array containing dcr events times</span>
+<span class="sd">    dev : str</span>
+<span class="sd">            String that describes the device on which the signal is computed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_core</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">if</span> <span class="n">current_core</span> <span class="o">==</span> <span class="s1">&#39;MainProcess&#39;</span><span class="p">:</span>
+        <span class="n">current_core</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">current_core</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">current_core</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
 
-	<span class="n">textstring</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Core: </span><span class="si">{</span><span class="n">current_core</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-	<span class="n">textstring</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">dev</span><span class="si">:</span><span class="s2">s</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-	<span class="n">textstring</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Photons:</span><span class="si">{</span><span class="n">sigTimes</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="n">dcrTime</span><span class="o">.</span><span class="n">size</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> Dcr:</span><span class="si">{</span><span class="n">dcrTime</span><span class="o">.</span><span class="n">size</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-	<span class="n">t</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="mf">0.70</span><span class="p">,</span><span class="n">textstring</span><span class="p">,</span><span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+    <span class="n">sipmmatrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">CELLSIDE</span><span class="p">,</span> <span class="n">CELLSIDE</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
 
-	<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">sigpts</span><span class="p">)</span><span class="o">*</span><span class="n">sampling</span><span class="p">,</span><span class="n">signal</span><span class="p">,</span><span class="s1">&#39;-b&#39;</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">idx</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">sigTimes</span><span class="p">,</span> <span class="n">dcrTime</span><span class="p">))</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">//</span> <span class="n">CELLSIDE</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">%</span> <span class="n">CELLSIDE</span>
+        <span class="n">sipmmatrix</span><span class="p">[</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">times</span>
 
-	<span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
-	<span class="n">ax</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-	<span class="n">t</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span></div>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">drawn</span><span class="p">[</span><span class="n">current_core</span><span class="p">]:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">211</span><span class="p">)</span>
+        <span class="n">screenx</span> <span class="o">=</span> <span class="mi">1920</span>
+        <span class="n">screeny</span> <span class="o">=</span> <span class="mi">1080</span>
+        <span class="n">xsize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screenx</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">ysize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screeny</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">xpos</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_core</span> <span class="o">%</span> <span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="n">xsize</span>
+        <span class="n">ypos</span> <span class="o">=</span> <span class="p">((</span><span class="n">current_core</span> <span class="o">//</span> <span class="mi">6</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">ysize</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">get_current_fig_manager</span><span class="p">()</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="n">xpos</span><span class="p">,</span> <span class="n">ypos</span><span class="p">,</span> <span class="n">xsize</span><span class="p">,</span> <span class="n">ysize</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">INTSTART</span> <span class="o">*</span> <span class="n">SAMPLING</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">INTSTART</span> <span class="o">*</span> <span class="n">SAMPLING</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">((</span><span class="n">INTSTART</span> <span class="o">-</span> <span class="n">PREG</span><span class="p">)</span> <span class="o">*</span> <span class="n">SAMPLING</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">INTSTART</span> <span class="o">*</span> <span class="n">SAMPLING</span><span class="p">,</span> <span class="p">(</span><span class="n">INTSTART</span> <span class="o">+</span> <span class="n">INTGATE</span><span class="p">)</span> <span class="o">*</span> <span class="n">SAMPLING</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">((</span><span class="n">INTSTART</span> <span class="o">+</span> <span class="n">INTGATE</span><span class="p">)</span> <span class="o">*</span> <span class="n">SAMPLING</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="n">INTSTART</span> <span class="o">+</span> <span class="n">INTGATE</span><span class="p">)</span> <span class="o">*</span> <span class="n">SAMPLING</span><span class="p">,</span> <span class="n">SIGLEN</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">integer</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">drawn</span><span class="p">[</span><span class="n">current_core</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">axm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">212</span><span class="p">)</span>
+        <span class="n">axm</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span>
+                            <span class="n">top</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axlist</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">axes</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">axm</span> <span class="o">=</span> <span class="n">axlist</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">textstring</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Core: </span><span class="si">{</span><span class="n">current_core</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">textstring</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">dev</span><span class="si">:</span><span class="s2">s</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">textstring</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;Photons:</span><span class="si">{</span><span class="n">sigTimes</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="n">dcrTime</span><span class="o">.</span><span class="n">size</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> Dcr:</span><span class="si">{</span><span class="n">dcrTime</span><span class="o">.</span><span class="n">size</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">txt</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.70</span><span class="p">,</span> <span class="n">textstring</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">SIGPTS</span><span class="p">)</span> <span class="o">*</span> <span class="n">SAMPLING</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">axm</span><span class="o">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">sipmmatrix</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+    <span class="n">txt</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span></div>
+
 
 <div class="viewcode-block" id="initializeRandomPool"><a class="viewcode-back" href="../../structure.html#libs.lib.initializeRandomPool">[docs]</a><span class="k">def</span> <span class="nf">initializeRandomPool</span><span class="p">():</span>
-	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	initializeRandomPool()</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    initializeRandomPool()</span>
 
-<span class="sd">	Function that initializes random seeds for each worker in the multiprocessing Pool</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="n">current_core</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>					<span class="c1"># Get current core number (using this trick becouse on MacOs psutil is not working)</span>
-	<span class="n">current_core</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">current_core</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-	<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="o">/</span><span class="n">nJobs</span><span class="o">*</span><span class="n">current_core</span><span class="p">)</span>
-	<span class="n">rngseed</span><span class="o">=</span><span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;I&#39;</span><span class="p">,</span><span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">current_core</span>				<span class="c1"># Get some random bits from the sistem entropy pool</span>
-	<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">rngseed</span><span class="p">)</span>													<span class="c1"># Change rng seed (must be different for each worker, otherwise they will generate same values)</span>
-	<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">rngseed</span><span class="p">)</span>
-	<span class="n">core</span><span class="o">=</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
-	<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initializing simulation on </span><span class="si">%s</span><span class="s2"> with seed </span><span class="si">%d</span><span class="se">\r</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">core</span><span class="p">,</span><span class="n">rngseed</span><span class="p">))</span></div>
+<span class="sd">    Function that initializes random seeds for each worker in the multiprocessing Pool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get current core number (On MacOs psutil is not working)</span>
+    <span class="n">current_core</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">current_core</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">current_core</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">/</span> <span class="n">nJobs</span> <span class="o">*</span> <span class="n">current_core</span><span class="p">)</span>
+    <span class="c1"># Get some random bits from the sistem entropy pool</span>
+    <span class="n">rngseed</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">current_core</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">rngseed</span><span class="p">)</span>   <span class="c1"># Change rng seed for each worker</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">rngseed</span><span class="p">)</span>
+    <span class="n">core</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initializing simulation on </span><span class="si">%s</span><span class="s2"> with seed </span><span class="si">%d</span><span class="se">\r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">core</span><span class="p">,</span> <span class="n">rngseed</span><span class="p">))</span></div>
+
 
 <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">def</span> <span class="nf">Callback</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
-	<span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>													<span class="c1"># Function that saves results from multiprocessing pool</span>
+    <span class="c1"># Function that saves results from multiprocessing pool</span>
+    <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">SaveFile</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="n">output</span><span class="p">):</span>
-	<span class="n">integral</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
-	<span class="n">peak</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
-	<span class="n">tstart</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
-	<span class="n">other</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">output</span><span class="p">[:,</span><span class="mi">3</span><span class="p">])</span>
 
-	<span class="n">event</span> <span class="o">=</span> <span class="n">other</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
-	<span class="n">fiber</span> <span class="o">=</span> <span class="n">other</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
-	<span class="n">theta</span> <span class="o">=</span> <span class="n">other</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
-	<span class="n">phi</span> <span class="o">=</span> <span class="n">other</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">SaveFile</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+    <span class="n">integral</span> <span class="o">=</span> <span class="n">out</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">peak</span> <span class="o">=</span> <span class="n">out</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">tstart</span> <span class="o">=</span> <span class="n">out</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">tover</span> <span class="o">=</span> <span class="n">out</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="n">ptime</span> <span class="o">=</span> <span class="n">out</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]</span>
+    <span class="n">other</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">out</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">])</span>
 
-	<span class="n">f</span> <span class="o">=</span> <span class="n">uproot</span><span class="o">.</span><span class="n">recreate</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-	<span class="n">f</span><span class="p">[</span><span class="s1">&#39;SiPMData&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uproot</span><span class="o">.</span><span class="n">newtree</span><span class="p">({</span><span class="s1">&#39;Integral&#39;</span><span class="p">:</span><span class="s1">&#39;float32&#39;</span><span class="p">,</span><span class="s1">&#39;Peak&#39;</span><span class="p">:</span><span class="s1">&#39;float32&#39;</span><span class="p">,</span><span class="s1">&#39;ToA&#39;</span><span class="p">:</span><span class="s1">&#39;int32&#39;</span><span class="p">})</span>
-	<span class="n">f</span><span class="p">[</span><span class="s1">&#39;GeometryData&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uproot</span><span class="o">.</span><span class="n">newtree</span><span class="p">({</span><span class="s1">&#39;EventId&#39;</span><span class="p">:</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span><span class="s1">&#39;FiberId&#39;</span><span class="p">:</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span><span class="s1">&#39;FiberTheta&#39;</span><span class="p">:</span><span class="s1">&#39;float32&#39;</span><span class="p">,</span><span class="s1">&#39;FiberPhi&#39;</span><span class="p">:</span><span class="s1">&#39;float32&#39;</span><span class="p">})</span>
+    <span class="n">event</span> <span class="o">=</span> <span class="n">other</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">fiber</span> <span class="o">=</span> <span class="n">other</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">other</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">other</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span>
 
-	<span class="n">f</span><span class="p">[</span><span class="s1">&#39;SiPMData&#39;</span><span class="p">][</span><span class="s1">&#39;Integral&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">integral</span><span class="p">)</span>
-	<span class="n">f</span><span class="p">[</span><span class="s1">&#39;SiPMData&#39;</span><span class="p">][</span><span class="s1">&#39;Peak&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
-	<span class="n">f</span><span class="p">[</span><span class="s1">&#39;SiPMData&#39;</span><span class="p">][</span><span class="s1">&#39;ToA&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">tstart</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">uproot</span><span class="o">.</span><span class="n">recreate</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;SiPMData&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uproot</span><span class="o">.</span><span class="n">newtree</span><span class="p">(</span>
+        <span class="p">{</span><span class="s1">&#39;Integral&#39;</span><span class="p">:</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;Peak&#39;</span><span class="p">:</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;ToA&#39;</span><span class="p">:</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;ToT&#39;</span><span class="p">:</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;ToP&#39;</span><span class="p">:</span> <span class="s1">&#39;float32&#39;</span><span class="p">})</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;GeometryData&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">uproot</span><span class="o">.</span><span class="n">newtree</span><span class="p">(</span>
+        <span class="p">{</span><span class="s1">&#39;EventId&#39;</span><span class="p">:</span> <span class="s1">&#39;int32&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;FiberId&#39;</span><span class="p">:</span> <span class="s1">&#39;int32&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;FiberTheta&#39;</span><span class="p">:</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;FiberPhi&#39;</span><span class="p">:</span> <span class="s1">&#39;float32&#39;</span><span class="p">})</span>
 
-	<span class="n">f</span><span class="p">[</span><span class="s1">&#39;GeometryData&#39;</span><span class="p">][</span><span class="s1">&#39;EventId&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
-	<span class="n">f</span><span class="p">[</span><span class="s1">&#39;GeometryData&#39;</span><span class="p">][</span><span class="s1">&#39;FiberId&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">fiber</span><span class="p">)</span>
-	<span class="n">f</span><span class="p">[</span><span class="s1">&#39;GeometryData&#39;</span><span class="p">][</span><span class="s1">&#39;FiberTheta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
-	<span class="n">f</span><span class="p">[</span><span class="s1">&#39;GeometryData&#39;</span><span class="p">][</span><span class="s1">&#39;FiberPhi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;SiPMData&#39;</span><span class="p">][</span><span class="s1">&#39;Integral&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">integral</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;SiPMData&#39;</span><span class="p">][</span><span class="s1">&#39;Peak&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;SiPMData&#39;</span><span class="p">][</span><span class="s1">&#39;ToA&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">tstart</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;SiPMData&#39;</span><span class="p">][</span><span class="s1">&#39;ToP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">ptime</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;SiPMData&#39;</span><span class="p">][</span><span class="s1">&#39;ToT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">tover</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">SaveWaves</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="n">output</span><span class="p">):</span>
-	<span class="n">signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">output</span><span class="p">[:,</span><span class="mi">4</span><span class="p">])</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;GeometryData&#39;</span><span class="p">][</span><span class="s1">&#39;EventId&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;GeometryData&#39;</span><span class="p">][</span><span class="s1">&#39;FiberId&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">fiber</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;GeometryData&#39;</span><span class="p">][</span><span class="s1">&#39;FiberTheta&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;GeometryData&#39;</span><span class="p">][</span><span class="s1">&#39;FiberPhi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">newbasket</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
 
-	<span class="n">sipmsettings</span> <span class="o">=</span> <span class="p">[</span><span class="n">size</span><span class="p">,</span>
-					<span class="n">cellsize</span><span class="p">,</span>
-					<span class="n">dcr</span><span class="p">,</span>
-					<span class="n">xt</span><span class="p">,</span>
-					<span class="n">ap</span><span class="p">,</span>
-					<span class="n">cellrecovery</span><span class="o">*</span><span class="n">sampling</span><span class="p">,</span>
-					<span class="n">trise</span><span class="o">*</span><span class="n">sampling</span><span class="p">,</span>
-					<span class="n">tfall</span><span class="o">*</span><span class="n">sampling</span><span class="p">,</span>
-					<span class="o">-</span><span class="mi">20</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">SNR</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
-					<span class="n">ccgv</span><span class="p">]</span>
 
-	<span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;waveforms.hdf5&#39;</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hf</span><span class="p">:</span>
-		<span class="n">fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">+</span><span class="s1">&#39;0&#39;</span>
-		<span class="n">groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">hf</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-		<span class="k">if</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
-			<span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-			<span class="n">fname</span> <span class="o">=</span> <span class="n">fname</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-		<span class="n">grp</span> <span class="o">=</span> <span class="n">hf</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-		<span class="n">dset1</span> <span class="o">=</span> <span class="n">grp</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;Waveforms&#39;</span><span class="p">,</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">,</span><span class="n">compression</span><span class="o">=</span><span class="s1">&#39;lzf&#39;</span><span class="p">,</span><span class="n">chunks</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">signals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-		<span class="n">dset2</span> <span class="o">=</span> <span class="n">grp</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;SiPMSettings&#39;</span><span class="p">,</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sipmsettings</span><span class="p">),),</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">,</span><span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span><span class="n">compression_opts</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
-		<span class="n">dset1</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">signals</span>
-		<span class="n">dset2</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">sipmsettings</span>
+<span class="k">def</span> <span class="nf">SaveWaves</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+    <span class="n">signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">out</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">sipmsettings</span> <span class="o">=</span> <span class="p">[</span><span class="n">SIZE</span><span class="p">,</span>
+                    <span class="n">CELLSIZE</span><span class="p">,</span>
+                    <span class="n">DCR</span><span class="p">,</span>
+                    <span class="n">XT</span><span class="p">,</span>
+                    <span class="n">AP</span><span class="p">,</span>
+                    <span class="n">CELLRECOVERY</span> <span class="o">*</span> <span class="n">SAMPLING</span><span class="p">,</span>
+                    <span class="n">TRISE</span> <span class="o">*</span> <span class="n">SAMPLING</span><span class="p">,</span>
+                    <span class="n">TFALL</span> <span class="o">*</span> <span class="n">SAMPLING</span><span class="p">,</span>
+                    <span class="o">-</span><span class="mi">20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">SNR</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
+                    <span class="n">CCGV</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;waveforms.hdf5&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hf</span><span class="p">:</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;0&#39;</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">hf</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">groups</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">fname</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">grp</span> <span class="o">=</span> <span class="n">hf</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="n">dset1</span> <span class="o">=</span> <span class="n">grp</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;Waveforms&#39;</span><span class="p">,</span>
+                                   <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                                   <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">,</span>
+                                   <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;lzf&#39;</span><span class="p">,</span>
+                                   <span class="n">chunks</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">signals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">dset2</span> <span class="o">=</span> <span class="n">grp</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;SiPMSettings&#39;</span><span class="p">,</span>
+                                   <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sipmsettings</span><span class="p">),),</span>
+                                   <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">,</span>
+                                   <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span>
+                                   <span class="n">compression_opts</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+        <span class="n">dset1</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">signals</span>
+        <span class="n">dset2</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">sipmsettings</span>
 </pre></div>
 
            </div>

@@ -3,6 +3,8 @@
 /libs/__pycache__
 *.txt ! files/
 *.so
+*.o
+*.s
 /docs/make.bat
 /docs/Makefile
 /docs/source/
