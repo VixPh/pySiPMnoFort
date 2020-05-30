@@ -5,8 +5,7 @@ from variables import *
 ###############################################################################
 ##>>>   EDITING THIS FILE MAY SERIOUSLY COMPROMISE SIMULATION BEHAVIOUR   <<<##
 ###############################################################################
-
-def PulseCPU(t, h):
+def PulseCPU(t, h, gainvar, nap):
     """
     PulseCPU(t,h)
 
@@ -25,10 +24,7 @@ def PulseCPU(t, h):
     s : np.ndarray
             Array containing the generated cell signal
     """
-    gainvar = np.float32(random.gauss(1, CCGV))  # Generate random ccgv
-    sig = signalgenfortran(t, h, TFALL, TRISE, SIGPTS,
-                           gainvar)    # Calculate signal
-    nap = poisson(AP)   # Generate number of afterpulses
+    sig = signalgenfortran(t, h, TFALL, TRISE, SIGPTS, gainvar)    # Calculate signal
     if nap > 0:  # If there are afterpulses generate theyr signals
         for _ in range(nap):
             # APs have a time delay exponential distribution
@@ -63,9 +59,12 @@ def SiPMSignalAction(times, sigH, SNR, BASESPREAD):
     signal : np.ndarray
             Array containing the generated SiPM signal
     """
+
     baseline = random.gauss(0, BASESPREAD)  # Add a baseline to the signal
     # Start with gaussian noise
     signal = np.random.normal(baseline, SNR, SIGPTS)
+    gainvars = np.random.normal(1, CCGV, size=times.size)   # Each signal has a ccgv
+    naps = poisson(AP,size=times.size)   # Generate number of afterpulses
     for i in range(times.size):
-        signal += PulseCPU(times[i], sigH[i])
+        signal += PulseCPU(times[i], sigH[i], gainvars[i], naps[i])
     return(signal)

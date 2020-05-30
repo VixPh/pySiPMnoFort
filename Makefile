@@ -1,6 +1,8 @@
 CC := gcc
-CF := "-Ofast -funroll-all-loops -ffast-math -fchecking -pipe"
-FF := --opt="-Ofast -funroll-all-loops -ffast-math -fopt-info-optall -fchecking -save-temps -dA"
+CF := "-Ofast -funroll-all-loops -ffast-math -fchecking"
+
+FF := --opt="-Ofast -funroll-all-loops -ffast-math -fopt-info -fchecking \
+-save-temps -dA"
 F2PY := f2py3.6
 
 SRCDIR := src/

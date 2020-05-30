@@ -23,6 +23,7 @@ def addDCR(rate):
     dcrTime : np.ndarray
             Array containing dcr times
     """
+
     if FASTDCR:
         ndcr = poisson(rate * SIGLEN * 1e-9)  # Poissonian distribution
         # Times uniformly distributed
@@ -58,10 +59,10 @@ def SiPMEventAction(time, XT):
     sigH : np.ndarray(float32)
             Array containing the pulse height of each fired SiPM cell
     """
+
     idx = -1
     evtTimes = []
     sigHtemp = []
-    time = np.delete(time, np.where((time > SIGLEN) | (time < 0)))
     n = time.size
     if n > 0:
         idx = randint(0, NCELL, n, dtype=np.int16)
@@ -83,7 +84,7 @@ def SiPMEventAction(time, XT):
                         -1 + CELLSIDE, 1 - CELLSIDE, 1 + CELLSIDE)
 
             nxt = poisson(XT, n)
-            if np.sum(nxt) > 0:
+            if np.count_nonzero(nxt):
                 xtcells = []
                 xttimes = []
                 for i in range(n):
@@ -133,7 +134,8 @@ def SiPMEventAction(time, XT):
 if args.signal is None:  # If generating signals fast (default)
     x = np.arange(0, SIGPTS)
 # Define the model of my signal (calculate it only once)
-    signalmodel = signalgenfortran(x, 1, TFALL, TRISE, SIGPTS, 1)
+    signalmodel = signalgenfortran(0, 1, TFALL, TRISE, SIGPTS, 1)
+
     def SiPMSignalAction(times, sigH, SNR, BASESPREAD):
         """
         signalGen(times,sigH,SNR,basespread)
@@ -157,13 +159,16 @@ if args.signal is None:  # If generating signals fast (default)
         signal : np.ndarray
                 Array containing the generated SiPM signal
         """
+
         baseline = random.gauss(0, BASESPREAD)  # Add a baseline
         signal = np.random.normal(baseline, SNR, SIGPTS)    # Start with gaussian noise
+        gainvars = np.random.normal(1, CCGV, size=times.size)   # Each signal has a ccgv
+        naps = poisson(AP, size=times.size)
         for i in range(times.size):   # Generate signals and sum them
-            signal += PulseCPU(times[i], sigH[i])
+            signal += PulseCPU(times[i], sigH[i], gainvars[i], naps[i])
         return signal
 
-    def PulseCPU(t, h):
+    def PulseCPU(t, h, gainvar, nap):
         """
         PulseCPU(t,h)
 
@@ -183,10 +188,9 @@ if args.signal is None:  # If generating signals fast (default)
         s : np.ndarray
                 Array containing the generated cell signal
         """
-        gainvar = random.gauss(1, CCGV)    # Each signal has a ccgv
+
         sig = rollfortran(signalmodel, t, gainvar, h, SIGPTS)   # Move the model signal
-        nap = poisson(AP)  # Generate number of afterpulses
-        if nap > 0:
+        if nap:
             for _ in range(nap):
                 # APs have a time delay exponential distribution
                 apdel = random.expovariate(1 / TAUAPFAST) + random.expovariate(1 / TAUAPSLOW)
@@ -329,21 +333,26 @@ def sigPlot(signal, sigTimes, dcrTime, dev, idx):
     dev : str
             String that describes the device on which the signal is computed
     """
+
     current_core = multiprocessing.current_process().name
     if current_core == 'MainProcess':
         current_core = 0
     else:
         current_core = int(current_core.split('-')[-1]) - 1
 
-    sipmmatrix = np.zeros((CELLSIDE, CELLSIDE), dtype='float32')
+    sipmmatrix = np.zeros((CELLSIDE, CELLSIDE), dtype='bool')
 
     if np.all(idx >= 0):
-        times = np.hstack((sigTimes, dcrTime))
+        times = sigTimes / SAMPLING
         rows = idx // CELLSIDE
         cols = idx % CELLSIDE
-        sipmmatrix[rows, cols] = times
+        sipmmatrix[rows, cols] = True
 
+    textstring = f"Core: {current_core:d}\n"
+    textstring += f"Device: {dev:s}\n"
+    textstring += f"Photons:{sigTimes.size-dcrTime.size:d} Dcr:{dcrTime.size:d}\n"
     if not drawn[current_core]:
+        timearray = np.arange(SIGPTS) * SAMPLING
         ax = plt.subplot(211)
         screenx = 1920
         screeny = 1080
@@ -364,23 +373,27 @@ def sigPlot(signal, sigTimes, dcrTime, dev, idx):
 
         axm = plt.subplot(212)
         axm.set_axis_off()
-        plt.subplots_adjust(left=0.01, bottom=0.01, right=0.99,
+        plt.subplots_adjust(left=0.1, bottom=0.01, right=0.99,
                             top=0.99, wspace=0.05, hspace=0.15)
+        ax.plot(timearray, signal, '-b', linewidth=0.5)
+        axm.matshow(sipmmatrix,aspect='equal',filternorm=False,resample=False,cmap='binary_r')
     else:
         axlist = plt.gcf().axes
         ax = axlist[0]
         axm = axlist[1]
 
-    textstring = f"Core: {current_core:d}\n"
-    textstring += f"Device: {dev:s}\n"
-    textstring += f"Photons:{sigTimes.size-dcrTime.size:d} Dcr:{dcrTime.size:d}\n"
+    line = ax.lines[-1]
+    img = axm.get_images()[0]
+
     txt = ax.text(0.5, 0.70, textstring, transform=ax.transAxes, fontsize=10)
 
-    ax.plot(np.arange(SIGPTS) * SAMPLING, signal, '-b', linewidth=0.5)
-    axm.matshow(sipmmatrix)
+    line.set_ydata(signal)
+    ax.relim()
+    ax.autoscale_view(tight=False, scalex=False, scaley=True)
 
-    plt.pause(0.25)
-    ax.lines[-1].remove()
+    img.set_data(sipmmatrix)
+
+    plt.pause(float(args.Graphics)/1000)
     txt.remove()
 
 
@@ -390,6 +403,7 @@ def initializeRandomPool():
 
     Function that initializes random seeds for each worker in the multiprocessing Pool
     """
+
     # Get current core number (On MacOs psutil is not working)
     current_core = multiprocessing.current_process().name
     current_core = int(current_core.split('-')[-1])

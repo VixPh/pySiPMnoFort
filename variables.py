@@ -10,6 +10,7 @@ import random
 import struct
 import sys
 import time
+import warnings
 from multiprocessing import Pool
 
 import h5py
@@ -123,8 +124,8 @@ parser.add_argument('-g', '--graphics', action='count',
 parser.add_argument('-q', '--quiet', action='count', help='Quiet')
 parser.add_argument('-w', '--write', nargs='?', type=str,
                     help='File to write as output', metavar='filename.root')
-parser.add_argument('-G', '--Graphics', action='count',
-                    help='Plot each signal (For debug purposes only)')
+parser.add_argument('-G', '--Graphics', action='store',
+                    help='Plot each signal (For debug purposes only) specify interval in ms')
 parser.add_argument('-j', '--jobs', type=int,
                     help='Number of jobs for multiprocessing', metavar='N')
 parser.add_argument('-NDCR', '--nodcr', action='count',
@@ -222,6 +223,8 @@ CELLSIDE = int(SIZE / (CELLSIZE * 1e-3))
 NCELL = int(CELLSIDE**2) - 1
 INTSTART = np.min(INTSTART, 0)
 if INTGATE + INTSTART > SIGLEN:
+    warnings.warn(f'Integration gate of {INTGATE:.0f} ns exeeds signal length of {SIGLEN:.0f} ns',
+                  category=UserWarning)
     INTGATE = SIGLEN - INTSTART
 INTSTART = int(INTSTART / SAMPLING)
 INTGATE = int(INTGATE / SAMPLING)

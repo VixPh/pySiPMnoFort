@@ -1,7 +1,6 @@
 # Function of simulation
 from libs.lib import *
 
-
 def SiPM(times, other):
     """
     SiPM(times,other)
@@ -43,9 +42,7 @@ def SiPM(times, other):
     if dcrTime.size:
         times = hstack((times, dcrTime))
     # Update list of times and signal height
-        sigTimes, sigH, idx = SiPMEventAction(times, XT)
-    else:
-        sigTimes, sigH, idx = SiPMEventAction(times, XT)
+    sigTimes, sigH, idx = SiPMEventAction(times, XT)
 
     # Generate digital signals
     signal = SiPMSignalAction(sigTimes, sigH, SNR, BASESPREAD)
@@ -54,9 +51,9 @@ def SiPM(times, other):
     signalInGate = signal[INTSTART:INTSTART + INTGATE]
     integral = signalInGate.sum() * SAMPLING
     peak = signalInGate.max()
-    tstart = np.argmax(signalInGate > 1.5) * SAMPLING
+    tstart = (signalInGate > 1.5).argmax() * SAMPLING
     tovert = np.count_nonzero(signalInGate > 1.5) * SAMPLING
-    tpeak = np.argmax(signalInGate) * SAMPLING
+    tpeak = (signalInGate).argmax() * SAMPLING
     if args.Graphics:
         if not args.signal:
             dev = 'cpu-fast'

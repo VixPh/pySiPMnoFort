@@ -9,12 +9,11 @@ pure subroutine signalgenfortran(s,t,h,tf,tr,sigpts,gvar)
 ! f2py intent(in) t,sigpts,h,gvar,tf,tr
 ! f2py intent(out),depend(sigpts) s
   s = 0
-  forall (i=t:min(sigpts,int(t+10*tf))) &
+  forall (i=t+1:min(sigpts,int(t+10*tf))) &
     s(i) = (exp((t-i+1)/tf)-exp((t-i+1)/tr))
   s = gvar*h*s
 
 end subroutine
-
 
 pure subroutine rollfortran(vecto,vect,t,gvar,h,npt)
   implicit none
@@ -22,7 +21,7 @@ pure subroutine rollfortran(vecto,vect,t,gvar,h,npt)
   real(4),intent(in)        :: gvar,h
   integer(4),intent(in)     :: t,npt
   real(4),intent(in)        :: vect(npt)
-  real(4),intent(out)       :: vecto(npt)s
+  real(4),intent(out)       :: vecto(npt)
 
 ! f2py intent(in) npt,t,gvar,h
 ! f2py intent(in),depend(npt) vect
