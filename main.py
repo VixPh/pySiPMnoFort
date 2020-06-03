@@ -1,6 +1,7 @@
 # Function of simulation
 from libs.lib import *
 
+
 def SiPM(times, other):
     """
     SiPM(times,other)
@@ -11,13 +12,13 @@ def SiPM(times, other):
     -----------
     times : np.ndarray
             This array contains the arriving time of each photon on the SiPM sensor surface.
-    This array is the input of the simulation.
+            This array is the input of the simulation.
 
     other : tuple
             This variable may contain other informations about the event generated.
-    It can be the event id, the arriving time inserted in the simulation
-    or the real number of photons inserted in the simulation.
-    This tuple will be copied as it is in the output.
+            It can be the event id, the arriving time inserted in the simulation
+            or the real number of photons inserted in the simulation.
+            This tuple will be copied as it is in the output.
 
     Returns
     ----------
@@ -35,14 +36,14 @@ def SiPM(times, other):
 
     signal : np.ndarray(float32)
             If the options -W is enabled the complete SiPM signal will be passed in the output.
-    Otherwise this output is None
+            Otherwise this output is None
     """
 
     dcrTime = addDCR(DCR)  # Generate DCR events (times)
     if dcrTime.size:
         times = hstack((times, dcrTime))
     # Update list of times and signal height
-    sigTimes, sigH, idx = SiPMEventAction(times, XT)
+    sigTimes, sigH, idx = SiPMEventAction(times.astype('float32'), XT)
 
     # Generate digital signals
     signal = SiPMSignalAction(sigTimes, sigH, SNR, BASESPREAD)
