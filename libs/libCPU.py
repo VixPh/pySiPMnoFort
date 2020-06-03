@@ -1,5 +1,5 @@
 # In this file I define all the functions I will use in the main file of simulation
-from libs.FortranFunctions import signalgenfortran
+from libs.FortranFunctions import signalgenfortran, randnfortran
 from variables import *
 
 ###############################################################################
@@ -18,12 +18,18 @@ def PulseCPU(t, h, gainvar, nap):
             Time at which the cell is triggered
     h : float32
             The relative pulse height of the cell signal
+    gainvar : float32
+            Value of cell to cell gain variation for this signal
+    nap : int32
+            Number of afterpulses in this signal
+
 
     Returns
     -------
     s : np.ndarray
             Array containing the generated cell signal
     """
+
     sig = signalgenfortran(t, h, TFALL, TRISE, SIGPTS, gainvar)    # Calculate signal
     if nap > 0:  # If there are afterpulses generate theyr signals
         for _ in range(nap):
@@ -38,10 +44,10 @@ def PulseCPU(t, h, gainvar, nap):
 # Function that passes signals times and height to main function for generating signals
 def SiPMSignalAction(times, sigH, SNR, BASESPREAD):
     """
-    SiPMSignalAction(times,sigH,SNR,basespread)
+    signalGen(times,sigH,SNR,BASESPREAD)
 
-    Function that passes signal height and times to the main function that generates single signals.
-    Also adds noise.
+    Function that passes signal height and times to the main function that
+    generates single signals. Also adds noise.
 
     Parameters
     ----------
@@ -51,7 +57,7 @@ def SiPMSignalAction(times, sigH, SNR, BASESPREAD):
             Array containing the pulse height of each fired SiPM cell
     SNR : double
             The signal to noise ratio of the noise to add
-    basespread : double
+    BASESPREAD : double
             Sigma of the value to add as baseline
 
     Returns
@@ -62,8 +68,8 @@ def SiPMSignalAction(times, sigH, SNR, BASESPREAD):
 
     baseline = random.gauss(0, BASESPREAD)  # Add a baseline to the signal
     # Start with gaussian noise
-    signal = np.random.normal(baseline, SNR, SIGPTS)
-    gainvars = np.random.normal(1, CCGV, size=times.size)   # Each signal has a ccgv
+    signal = randnfortran(baseline, SNR, SIGPTS)
+    gainvars = randnfortran(1, CCGV, times.size)   # Each signal has a ccgv
     naps = poisson(AP,size=times.size)   # Generate number of afterpulses
     for i in range(times.size):
         signal += PulseCPU(times[i], sigH[i], gainvars[i], naps[i])

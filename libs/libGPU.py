@@ -46,7 +46,7 @@ def PulseGPU(t, h):
     # Call kernel to generate singal
     sig = normpe * cp.sum(signalShapeGPU(vect, TFALL, TRISE, gainvar, h), axis=0)
     # If there are afterpulses generate theyr signals
-    if nap > 0:
+    if nap:
         apdel = cp.random.exponential(TAUAPFAST, nap, dtype='float32') + cp.random.exponential(TAUAPSLOW, nap, dtype='float32')
         # Select wich signals will have ap
         apSig = randint(0, n, dtype='int32')
@@ -60,7 +60,7 @@ def PulseGPU(t, h):
     return sig
 
 
-def PulseCPU(t, h):
+def PulseCPU(t, h, gainvar, nap):
     """
     PulseCPU(t,h)
 
@@ -73,20 +73,24 @@ def PulseCPU(t, h):
             Time at which the cell is triggered
     h : float32
             The relative pulse height of the cell signal
+    gainvar : float32
+            Value of cell to cell gain variation for this signal
+    nap : int32
+            Number of afterpulses in this signal
+
 
     Returns
     -------
     s : np.ndarray
             Array containing the generated cell signal
     """
-    gainvar = np.float32(random.gauss(1, CCGV))  # Generate random ccgv
-    sig = signalgenfortran(t, h, TFALL, TRISE, SIGPTS, gainvar)
-    nap = poisson(ap)  # Generate number of afterpulses
+
+    sig = signalgenfortran(t, h, TFALL, TRISE, SIGPTS, gainvar)    # Calculate signal
     if nap > 0:  # If there are afterpulses generate theyr signals
-        for i in range(nap):
+        for _ in range(nap):
             # APs have a time delay exponential distribution
             apdel = random.expovariate(1 / TAUAPFAST) + random.expovariate(1 / TAUAPSLOW)
-            tap = np.int32(apdel / sampling + t)
+            tap = np.int32(apdel / SAMPLING + t)
             hap = 1 - exp(-apdel / TFALL)
             sig += signalgenfortran(tap, hap, TFALL, TRISE, SIGPTS, gainvar)
     return sig
@@ -120,10 +124,12 @@ def SiPMSignalAction(times, sigH, SNR, BASESPREAD):
     baseline = random.gauss(0, BASESPREAD)
     if (times.size < CPUTHRESHOLD) or (times.size > GPUMAX):
         signal = np.random.normal(baseline, SNR, SIGPTS)
+        gainvars = np.random.normal(1, CCGV, size=times.size)   # Each signal has a ccgv
+        naps = poisson(AP, size=times.size)   # Generate number of afterpulses
         for i in range(times.size):
-            signal += PulseCPU(times[i], sigH[i])
-        return(signal)
+            signal += PulseCPU(times[i], sigH[i], gainvars[i], naps[i])
+        return signal
     else:
         signal = cp.random.normal(baseline, SNR,SIGPTS,dtype='float32')
         signal += PulseGPU(cp.asarray(times), cp.asarray(sigH))
-        return(cp.asnumpy(signal))
+        return cp.asnumpy(signal)

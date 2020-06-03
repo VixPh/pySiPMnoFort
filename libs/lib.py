@@ -1,5 +1,7 @@
 # In this file I define all the functions I will use in the main file of simulation
-from libs.FortranFunctions import rollfortran, signalgenfortran
+from libs.FortranFunctions import randintfortran, rollfortran, signalgenfortran
+from libs.FortranFunctions import randnfortran, randpoissfortran, randexpfortran
+from libs.FortranFunctions import sortfortran
 from variables import *
 
 ###############################################################################
@@ -25,14 +27,14 @@ def addDCR(rate):
     """
 
     if FASTDCR:
-        ndcr = poisson(rate * SIGLEN * 1e-9)  # Poissonian distribution
+        ndcr = randpoissfortran(rate * SIGLEN * 1e-9, 1)  # Poissonian distribution
         # Times uniformly distributed
         dcrTime = np.random.random(ndcr) * SIGLEN
     else:
         dcrTime = [0]
         while dcrTime[-1] < SIGLEN:  # Generate from exponential distribution of delays
-            delayDCR = random.expovariate(rate) * 1e9
-            dcrTime.append(dcrTime[-1] + delayDCR)
+            delayDCR = randexpfortran(1/rate, 1) * 1e9
+            dcrTime.extend(dcrTime[-1] + delayDCR)
         dcrTime = np.array(dcrTime[1:-1])
 
     return dcrTime
@@ -41,16 +43,16 @@ def addDCR(rate):
 ###FUNCTION TO UPDATE THE SIPM MATRIX ARRAY###
 def SiPMEventAction(time, XT):
     """
-    evtsGen(time,xt)
+    evtsGen(time,XT)
 
     Function that calculates signal height for each SiPM cell and adds optical crosstalk events.
 
     Parameters
     ----------
     time : np.ndarray
-            Array containing the time at which SiPM cells are fired
+        Array containing the time at which SiPM cells are fired
     XT : double
-            Value of optical crosstalk probability
+        Value of optical crosstalk probability
 
     Returns
     -------
@@ -58,6 +60,8 @@ def SiPMEventAction(time, XT):
             Array containing the time at wich SiPM cells are fired, including xt events (sorted)
     sigH : np.ndarray(float32)
             Array containing the pulse height of each fired SiPM cell
+    idx : np.ndarray(int16)
+            Array containing the unique index of the hitted cells
     """
 
     idx = -1
@@ -65,31 +69,28 @@ def SiPMEventAction(time, XT):
     sigHtemp = []
     n = time.size
     if n > 0:
-        idx = randint(0, NCELL, n, dtype=np.int16)
-        time = (sort(time) / SAMPLING)
+        idx = randintfortran(NCELL,n)
+        sortfortran(time)
+        time /= SAMPLING
+        addcells = np.array((-1, 1, -CELLSIDE, CELLSIDE, -1 - CELLSIDE,
+        -1 + CELLSIDE, 1 - CELLSIDE, 1 + CELLSIDE))
         if FASTXT:
-            nxt = poisson(XT * n)
-            if nxt > 0:
-                addcells = (-1, 1, -CELLSIDE, CELLSIDE, -1 - CELLSIDE,
-                            -1 + CELLSIDE, 1 - CELLSIDE, 1 + CELLSIDE)
-
-                xtidx = randint(0, n, nxt, dtype=np.int16)
+            nxt = randpoissfortran(XT * n, 1)
+            if nxt:
+                xtidx = randintfortran(n-1,nxt)
                 xtcells = idx[xtidx]
                 xttimes = time[xtidx]
-                xtcells += choice(addcells, nxt)
+                xtcells += addcells[randintfortran(7,nxt)]
                 idx = hstack((idx, xtcells))
                 time = hstack((time, xttimes))
-        elif not FASTXT:
-            addcells = (-1, 1, -CELLSIDE, CELLSIDE, -1 - CELLSIDE,
-                        -1 + CELLSIDE, 1 - CELLSIDE, 1 + CELLSIDE)
-
-            nxt = poisson(XT, n)
+        else:
+            nxt = randpoissfortran(XT, n)
             if np.count_nonzero(nxt):
                 xtcells = []
                 xttimes = []
                 for i in range(n):
-                    if nxt[i] > 0:
-                        xtcells.extend(idx[i] + choice(addcells, nxt[i]))
+                    if nxt[i]:
+                        xtcells.extend(idx[i] + addcells[randintfortran(7,nxt[i])])
                         xttimes.extend([time[i]] * nxt[i])
                 idx = hstack((idx, xtcells))
                 time = hstack((time, xttimes))
@@ -99,7 +100,6 @@ def SiPMEventAction(time, XT):
             sigH = time * 0 + 1
         else:
             _, uCellsIdx, uCellsCounts = np.unique(idx, return_index=True, return_counts=True)
-
             # Times of cells fired once
             sTimes = time[uCellsIdx[uCellsCounts == 1]]
             evtTimes.append(sTimes)
@@ -110,7 +110,8 @@ def SiPMEventAction(time, XT):
             for i in range(mCellIdx.size):
                 mCellI = mCellIdx[i]    # Loop on cells fired multiple times
                 # Times of events in the same cell
-                mCellT = sort(time[idx == mCellI])
+                mCellT = time[idx == mCellI]
+                sortfortran(mCellT)
                 # Delays of events consecutive to the first
                 delays = mCellT - mCellT[0]
                 # Calculate height of pulses
@@ -125,9 +126,7 @@ def SiPMEventAction(time, XT):
         evtTimes = np.empty(0)
         sigH = np.empty(0)
 
-    if not args.Graphics:
-        idx = None
-    return(np.array(evtTimes, dtype='int32'), np.array(sigH, dtype='float32'), idx)
+    return(np.int32(evtTimes), np.float32(sigH), idx)
 
 
 ### GENERATION OF SIGNALS SHAPES FAST ###
@@ -138,7 +137,7 @@ if args.signal is None:  # If generating signals fast (default)
 
     def SiPMSignalAction(times, sigH, SNR, BASESPREAD):
         """
-        signalGen(times,sigH,SNR,basespread)
+        signalGen(times,sigH,SNR,BASESPREAD)
 
         Function that passes signal height and times to the main function that
         generates single signals. Also adds noise.
@@ -151,7 +150,7 @@ if args.signal is None:  # If generating signals fast (default)
                 Array containing the pulse height of each fired SiPM cell
         SNR : double
                 The signal to noise ratio of the noise to add
-        basespread : double
+        BASESPREAD : double
                 Sigma of the value to add as baseline
 
         Returns
@@ -161,9 +160,9 @@ if args.signal is None:  # If generating signals fast (default)
         """
 
         baseline = random.gauss(0, BASESPREAD)  # Add a baseline
-        signal = np.random.normal(baseline, SNR, SIGPTS)    # Start with gaussian noise
-        gainvars = np.random.normal(1, CCGV, size=times.size)   # Each signal has a ccgv
-        naps = poisson(AP, size=times.size)
+        signal = randnfortran(baseline, SNR, SIGPTS)    # Start with gaussian noise
+        gainvars = randnfortran(1, CCGV, times.size)    # Each signal has a ccgv
+        naps = randpoissfortran(AP, times.size)
         for i in range(times.size):   # Generate signals and sum them
             signal += PulseCPU(times[i], sigH[i], gainvars[i], naps[i])
         return signal
@@ -182,6 +181,11 @@ if args.signal is None:  # If generating signals fast (default)
                 Time at which the cell is triggered
         h : float32
                 The relative pulse height of the cell signal
+        gainvar : float32
+                Value of cell to cell gain variation for this signal
+        nap : int32
+                Number of afterpulses in this signal
+
 
         Returns
         -------
@@ -189,16 +193,16 @@ if args.signal is None:  # If generating signals fast (default)
                 Array containing the generated cell signal
         """
 
-        sig = rollfortran(signalmodel, t, gainvar, h, SIGPTS)   # Move the model signal
+        sig = rollfortran(signalmodel, t, gainvar, h)   # Move the model signal
         if nap:
             for _ in range(nap):
                 # APs have a time delay exponential distribution
-                apdel = random.expovariate(1 / TAUAPFAST) + random.expovariate(1 / TAUAPSLOW)
+                apdel = randexpfortran(1 / TAUAPFAST, 1) + randexpfortran(1 / TAUAPSLOW, 1)
                 tap = np.int32(apdel / SAMPLING + t)
                 if tap < SIGPTS:
                     # Generate ap signal height as an RC circuit
                     hap = 1 - exp(-apdel / CELLRECOVERY)
-                    sap = rollfortran(signalmodel, tap, gainvar, hap, SIGPTS)
+                    sap = rollfortran(signalmodel, tap, gainvar, hap)
                     sig += sap       # Add each ap
         return sig
 
@@ -344,8 +348,8 @@ def sigPlot(signal, sigTimes, dcrTime, dev, idx):
 
     if np.all(idx >= 0):
         times = sigTimes / SAMPLING
-        rows = idx // CELLSIDE
-        cols = idx % CELLSIDE
+        rows = (idx // CELLSIDE) % CELLSIDE
+        cols = (idx % CELLSIDE) % CELLSIDE
         sipmmatrix[rows, cols] = True
 
     textstring = f"Core: {current_core:d}\n"
