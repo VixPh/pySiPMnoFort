@@ -2,7 +2,7 @@
 from libs.lib import *
 
 
-def SiPM(times, other):
+def SiPM(times, other=None):
     """
     SiPM(times,other)
 

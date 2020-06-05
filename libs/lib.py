@@ -240,7 +240,7 @@ def somestats(output):
     tstart = output[:, 2]
     tovert = output[:, 3]
     tpeak = output[:, 4]
-    other = output[:, 5]
+    # other = output[:, 5]
 
     ROOT.gROOT.SetStyle("ATLAS")
     ROOT.gStyle.SetOptStat(1)
@@ -346,7 +346,7 @@ def sigPlot(signal, sigTimes, dcrTime, dev, idx):
 
     sipmmatrix = np.zeros((CELLSIDE, CELLSIDE), dtype='bool')
 
-    if np.all(idx >= 0):
+    if np.any(idx >= 0):
         times = sigTimes / SAMPLING
         rows = (idx // CELLSIDE) % CELLSIDE
         cols = (idx % CELLSIDE) % CELLSIDE
@@ -420,12 +420,6 @@ def initializeRandomPool():
     print("Initializing simulation on %s with seed %d\r" % (core, rngseed))
 
 
-output = []
-def Callback(results):
-    # Function that saves results from multiprocessing pool
-    output.append(results)
-
-
 def SaveFile(fname, out):
     integral = out[:, 0]
     peak = out[:, 1]
@@ -464,8 +458,7 @@ def SaveFile(fname, out):
     f['GeometryData']['FiberPhi'].newbasket(phi)
 
 
-def SaveWaves(fname, out):
-    signals = np.vstack(out[:, -1])
+def SaveWaves(fname, signals):
 
     sipmsettings = [SIZE,
                     CELLSIZE,
@@ -489,7 +482,7 @@ def SaveWaves(fname, out):
         dset1 = grp.create_dataset('Waveforms',
                                    shape=(signals.shape),
                                    dtype='f',
-                                   compression='lzf',
+                                   compression='gzip',
                                    chunks=(1, signals.shape[1]))
         dset2 = grp.create_dataset('SiPMSettings',
                                    shape=(len(sipmsettings),),
