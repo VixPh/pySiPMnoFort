@@ -1,14 +1,14 @@
 # In this file I define all the functions I will use in the main file of simulation
-from libs.FortranFunctions import randintfortran, rollfortran, signalgenfortran
-from libs.FortranFunctions import randnfortran, randpoissfortran, randexpfortran
-from libs.FortranFunctions import sortfortran
+from libs.FortranFunctions import rollfortran, signalgenfortran, sortfortran
+from libs.FortranFunctions import frandom
 from variables import *
+
 
 ###############################################################################
 ##>>>   EDITING THIS FILE MAY SERIOUSLY COMPROMISE SIMULATION BEHAVIOUR   <<<##
 ###############################################################################
 
-###GENERATION OF DCR TIMES###
+### GENERATION OF DCR TIMES ###
 def addDCR(rate):
     """
     addDCR(rate)
@@ -27,20 +27,20 @@ def addDCR(rate):
     """
 
     if FASTDCR:
-        ndcr = randpoissfortran(rate * SIGLEN * 1e-9, 1)  # Poissonian distribution
+        ndcr = frandom.randpoiss(rate * SIGLEN * 1e-9, 1)  # Poissonian distribution
         # Times uniformly distributed
         dcrTime = np.random.random(ndcr) * SIGLEN
     else:
         dcrTime = [0]
         while dcrTime[-1] < SIGLEN:  # Generate from exponential distribution of delays
-            delayDCR = randexpfortran(1/rate, 1) * 1e9
+            delayDCR = frandom.randexp(1/rate, 1) * 1e9
             dcrTime.extend(dcrTime[-1] + delayDCR)
         dcrTime = np.array(dcrTime[1:-1])
 
     return dcrTime
 
 
-###FUNCTION TO UPDATE THE SIPM MATRIX ARRAY###
+### FUNCTION TO UPDATE THE SIPM MATRIX ARRAY ###
 def SiPMEventAction(time, XT):
     """
     evtsGen(time,XT)
@@ -69,28 +69,27 @@ def SiPMEventAction(time, XT):
     sigHtemp = []
     n = time.size
     if n > 0:
-        idx = randintfortran(NCELL,n)
+        idx = frandom.randint(NCELL, n)
         sortfortran(time)
         time /= SAMPLING
-        addcells = np.array((-1, 1, -CELLSIDE, CELLSIDE, -1 - CELLSIDE,
-        -1 + CELLSIDE, 1 - CELLSIDE, 1 + CELLSIDE))
+        addcells = np.array((-1, 1, -CELLSIDE, CELLSIDE, -1 - CELLSIDE, -1 + CELLSIDE, 1 - CELLSIDE, 1 + CELLSIDE))
         if FASTXT:
-            nxt = randpoissfortran(XT * n, 1)
+            nxt = frandom.randpoiss(XT * n, 1)
             if nxt:
-                xtidx = randintfortran(n-1,nxt)
+                xtidx = frandom.randint(n-1, nxt)
                 xtcells = idx[xtidx]
                 xttimes = time[xtidx]
-                xtcells += addcells[randintfortran(7,nxt)]
+                xtcells += addcells[frandom.randint(7, nxt)]
                 idx = hstack((idx, xtcells))
                 time = hstack((time, xttimes))
         else:
-            nxt = randpoissfortran(XT, n)
+            nxt = frandom.randpoiss(XT, n)
             if np.count_nonzero(nxt):
                 xtcells = []
                 xttimes = []
                 for i in range(n):
                     if nxt[i]:
-                        xtcells.extend(idx[i] + addcells[randintfortran(7,nxt[i])])
+                        xtcells.extend(idx[i] + addcells[frandom.randint(7, nxt[i])])
                         xttimes.extend([time[i]] * nxt[i])
                 idx = hstack((idx, xtcells))
                 time = hstack((time, xttimes))
@@ -158,11 +157,10 @@ if args.signal is None:  # If generating signals fast (default)
         signal : np.ndarray
                 Array containing the generated SiPM signal
         """
-
         baseline = random.gauss(0, BASESPREAD)  # Add a baseline
-        signal = randnfortran(baseline, SNR, SIGPTS)    # Start with gaussian noise
-        gainvars = randnfortran(1, CCGV, times.size)    # Each signal has a ccgv
-        naps = randpoissfortran(AP, times.size)
+        signal = frandom.randn(baseline, SNR, SIGPTS)    # Start with gaussian noise
+        gainvars = frandom.randn(1, CCGV, times.size)    # Each signal has a ccgv
+        naps = frandom.randpoiss(AP, times.size)
         for i in range(times.size):   # Generate signals and sum them
             signal += PulseCPU(times[i], sigH[i], gainvars[i], naps[i])
         return signal
@@ -197,7 +195,7 @@ if args.signal is None:  # If generating signals fast (default)
         if nap:
             for _ in range(nap):
                 # APs have a time delay exponential distribution
-                apdel = randexpfortran(1 / TAUAPFAST, 1) + randexpfortran(1 / TAUAPSLOW, 1)
+                apdel = frandom.randexp(TAUAPFAST, 1) + frandom.randexp(TAUAPSLOW, 1)
                 tap = np.int32(apdel / SAMPLING + t)
                 if tap < SIGPTS:
                     # Generate ap signal height as an RC circuit
@@ -214,10 +212,10 @@ else:								# Recalculate the signal each time
     if args.device == 'gpu':
         from libs.libGPU import *   # Cpu for low light and cpu for high light
 
-###SOME STATISCTICS AT END OF SCRIPT###
+### SOME STATISCTICS AT END OF SCRIPT ###
 
 
-def somestats(output):
+def somestats(output, realpe=None):
     """
     somestats(output)
 
@@ -240,86 +238,74 @@ def somestats(output):
     tstart = output[:, 2]
     tovert = output[:, 3]
     tpeak = output[:, 4]
-    # other = output[:, 5]
 
-    ROOT.gROOT.SetStyle("ATLAS")
-    ROOT.gStyle.SetOptStat(1)
-    ROOT.gStyle.SetOptFit(1)
-    ROOT.gStyle.SetHistFillColor(603)
-    c1 = ROOT.TCanvas('c1', 'Histogram', 600, 400)
-    c2 = ROOT.TCanvas('c2', 'Histogram', 600, 400)
-    c3 = ROOT.TCanvas('c3', 'Histogram', 600, 400)
-    c4 = ROOT.TCanvas('c4', 'Histogram', 600, 400)
-    c5 = ROOT.TCanvas('c5', 'Staircase', 600, 400)
-    c6 = ROOT.TCanvas('c6', 'Histogram', 600, 400)
-    c7 = ROOT.TCanvas('c7', 'Histogram', 600, 400)
+    plt.figure()
+    plt.title('Integral')
+    plt.hist(integral, 500, color='k')
+    plt.xlabel('Integrated charge [A.U.]')
 
-    h1 = ROOT.TH1F('Integral', 'Integral', 750, integral.min(), integral.max())
-    h1.SetXTitle('Integral [A.U.]')
-    h1.SetYTitle('Entries')
-    h2 = ROOT.TH1F('Peak Value', 'Peak', 750, peak.min(), peak.max())
-    h2.SetXTitle('Peak [A.U.]')
-    h2.SetYTitle('Entries')
-    inf = tstart.min()
-    sup = tstart.max()
-    n_bin = int((sup - inf) / SAMPLING)
-    h3 = ROOT.TH1F('Starting Time', 'Tstart', n_bin, inf, sup)
-    h3.SetXTitle('Starting Time [ns]')
-    h4 = ROOT.TH2F('Histogram', 'Peak - Integral', 200, min(peak),max(peak), 200, min(integral), max(integral))
-    h4.SetXTitle('Peak [A.U.]')
-    h4.SetYTitle('Integral [A.U.]')
-    inf = 0
-    sup = tovert.max()
-    n_bin = int((sup - inf) / SAMPLING)
-    h5 = ROOT.TH1F('ToT', 'Time over threshld', n_bin, inf, sup)
-    h5.SetXTitle('Time [ns]')
-    h5.SetYTitle('Entries')
-    inf = 0
-    sup = tpeak.max()
-    n_bin = int((sup - inf) / SAMPLING)
-    h6 = ROOT.TH1F('ToP', 'Time of peak', n_bin, inf, sup)
-    h6.SetXTitle('Time [ns]')
-    h6.SetYTitle('Entries')
-    [h1.Fill(i) for i in integral]
-    [h2.Fill(i) for i in peak]
-    [h3.Fill(i) for i in tstart]
-    [h4.Fill(i, j) for i, j in zip(peak, integral)]
-    [h5.Fill(i) for i in tovert]
-    [h6.Fill(i) for i in tpeak]
-    c1.cd()
-    h1.Draw("bar9")
-    c2.cd()
-    h2.Draw("bar9")
-    c3.cd()
-    h3.Draw("E9")
-    c4.cd()
-    h4.Draw("colz")
-    c5.cd()
-    c5.SetLogy()
-    staircase = h2.GetCumulative(False, ' Staircase')
-    staircase.Scale(1e-3 / h2.Integral() / (INTGATE * SAMPLING * 1e-9))
-    staircase.SetLineColor(2)
-    staircase.SetTitle('Staircase')
-    staircase.SetXTitle('Peak [A.U.]')
-    staircase.SetYTitle('Rate [kHz]')
-    staircase.SetFillColor(0)
-    staircase.Draw("hist9")
-    c6.cd()
-    h5.Draw("bar9")
-    c7.cd()
-    h6.Draw("bar9")
-    c1.Update()
-    c2.Update()
-    c3.Update()
-    c4.Update()
-    c5.Update()
-    c6.Update()
-    c7.Update()
-    input('Press <RET> to continue...')
-    return
+    plt.figure()
+    plt.title('Peak')
+    plt.hist(peak, 500, color='k')
+    plt.xlabel('Peak value [A.U.]')
+
+    plt.figure()
+    plt.title('Starting time')
+    plt.hist(tstart, np.arange(tstart.min()-2, tstart.max()+2, 2*SAMPLING), color='k')
+    plt.xlabel('Starting time [ns]')
+    plt.yscale('log')
+
+    plt.figure()
+    plt.title('Time over threshold')
+    plt.hist(tovert, np.arange(tovert.min(), tovert.max(), 2*SAMPLING), color='k')
+    plt.xlabel('Time over threshold [ns]')
+
+    plt.figure()
+    plt.title('Peaking time')
+    plt.hist(tpeak, np.arange(tpeak.min(), tpeak.max(), 2*SAMPLING), color='k')
+    plt.xlabel('Peaking time [ns]')
+
+    plt.figure()
+    x = np.sort(peak)
+    y = np.empty_like(x)
+    for i in range(x.size):
+        y[i] = np.count_nonzero(x > x[i])
+
+    y *= (1e-3 / y.size / (INTGATE * SAMPLING * 1e-9))
+    if peak.max() < 5:
+        plt.hlines(DCR/1e3, x.min(), x.max(), 'k', label=f'DCR = {DCR*1e-3:.0f} kHz')
+        plt.legend()
+    plt.plot(x, y, '.r')
+    plt.yscale('log')
+    plt.ylabel('Rate [kHz]')
+    plt.xlabel('Threshold')
+    plt.title('Staircase')
+
+    if realpe is not None:
+        plt.figure()
+        plt.subplot(121)
+        plt.scatter(realpe, peak, c='k', s=2)
+        plt.xlabel('Real number of photoelectrons')
+        plt.ylabel('Peak value measured')
+        plt.subplot(122)
+        plt.hist2d(realpe, peak, bins=(100, 100))
+        plt.xlabel('Real number of photoelectrons')
+        plt.ylabel('Peak value measured')
+
+    plt.figure()
+    plt.subplot(121)
+    plt.scatter(peak, integral, c='k', s=2)
+    plt.xlabel('Peak value measured')
+    plt.ylabel('Integrated charge')
+    plt.subplot(122)
+    plt.hist2d(peak, integral, bins=(100, 100))
+    plt.xlabel('Peak value measured')
+    plt.ylabel('Integrated charge')
+    plt.show()
 
 
 drawn = [False] * nJobs
+opened = [True] * nJobs
 def sigPlot(signal, sigTimes, dcrTime, dev, idx):
     """
     sigPlot(signal,sigTimes,dcrTime,dev)
@@ -380,25 +366,31 @@ def sigPlot(signal, sigTimes, dcrTime, dev, idx):
         plt.subplots_adjust(left=0.1, bottom=0.01, right=0.99,
                             top=0.99, wspace=0.05, hspace=0.15)
         ax.plot(timearray, signal, '-b', linewidth=0.5)
-        axm.matshow(sipmmatrix,aspect='equal',filternorm=False,resample=False,cmap='binary_r')
+        axm.matshow(sipmmatrix, aspect='equal', filternorm=False, resample=False, cmap='binary_r')
     else:
         axlist = plt.gcf().axes
-        ax = axlist[0]
-        axm = axlist[1]
+        if len(axlist) == 0:
+            opened[current_core] = False
+        if opened[current_core]:
+            ax = axlist[0]
+            axm = axlist[1]
+            if signal.max() > opened[current_core]:
+                opened[current_core] = signal.max()
 
-    line = ax.lines[-1]
-    img = axm.get_images()[0]
+    if opened[current_core]:
+        line = ax.lines[-1]
+        img = axm.get_images()[0]
 
-    txt = ax.text(0.5, 0.70, textstring, transform=ax.transAxes, fontsize=10)
+        txt = ax.text(0.5, 0.70, textstring, transform=ax.transAxes, fontsize=10)
 
-    line.set_ydata(signal)
-    ax.relim()
-    ax.autoscale_view(tight=False, scalex=False, scaley=True)
+        line.set_ydata(signal)
+        # ax.relim()
+        # ax.autoscale_view(tight=False, scalex=False, scaley=True)
+        ax.set_ylim(-1, opened[current_core] * 1.1)
+        img.set_data(sipmmatrix)
 
-    img.set_data(sipmmatrix)
-
-    plt.pause(float(args.Graphics)/1000)
-    txt.remove()
+        plt.pause(float(args.Graphics)/1000)
+        txt.remove()
 
 
 def initializeRandomPool():
@@ -420,18 +412,12 @@ def initializeRandomPool():
     print("Initializing simulation on %s with seed %d\r" % (core, rngseed))
 
 
-def SaveFile(fname, out):
+def SaveFile(fname, out, other=None):
     integral = out[:, 0]
     peak = out[:, 1]
     tstart = out[:, 2]
     tover = out[:, 3]
     ptime = out[:, 4]
-    other = np.vstack(out[:, 5])
-
-    event = other[:, 0]
-    fiber = other[:, 1]
-    theta = other[:, 2]
-    phi = other[:, 3]
 
     f = uproot.recreate(fname)
     f['SiPMData'] = uproot.newtree(
@@ -440,11 +426,6 @@ def SaveFile(fname, out):
          'ToA': 'float32',
          'ToT': 'float32',
          'ToP': 'float32'})
-    f['GeometryData'] = uproot.newtree(
-        {'EventId': 'int32',
-         'FiberId': 'int32',
-         'FiberTheta': 'float32',
-         'FiberPhi': 'float32'})
 
     f['SiPMData']['Integral'].newbasket(integral)
     f['SiPMData']['Peak'].newbasket(peak)
@@ -452,13 +433,31 @@ def SaveFile(fname, out):
     f['SiPMData']['ToP'].newbasket(ptime)
     f['SiPMData']['ToT'].newbasket(tover)
 
-    f['GeometryData']['EventId'].newbasket(event)
-    f['GeometryData']['FiberId'].newbasket(fiber)
-    f['GeometryData']['FiberTheta'].newbasket(theta)
-    f['GeometryData']['FiberPhi'].newbasket(phi)
+    if other:
+        event = other[:, 0]
+        fiber = other[:, 1]
+        theta = other[:, 2]
+        phi = other[:, 3]
+
+        f['GeometryData'] = uproot.newtree(
+            {'EventId': 'int32',
+             'FiberId': 'int32',
+             'FiberTheta': 'float32',
+             'FiberPhi': 'float32'})
+
+        f['GeometryData']['EventId'].newbasket(event)
+        f['GeometryData']['FiberId'].newbasket(fiber)
+        f['GeometryData']['FiberTheta'].newbasket(theta)
+        f['GeometryData']['FiberPhi'].newbasket(phi)
 
 
 def SaveWaves(fname, signals):
+    while os.path.exists(fname):
+        f = fname.split('.')
+        if f[0][-1].isnumeric():
+            fname = f[0][:-1]+str(int(f[0][-1])+1)+'.hdf5'
+        else:
+            fname = f[0]+'0'+'.'+f[1]
 
     sipmsettings = [SIZE,
                     CELLSIZE,
@@ -471,23 +470,16 @@ def SaveWaves(fname, signals):
                     -20 * np.log10(SNR**2),
                     CCGV]
 
-    with h5py.File('waveforms.hdf5', 'a') as hf:
-        fname = fname + '0'
-        groups = list(hf.keys())
-        if fname in groups:
-            i = int(groups[-1][-1])
-            fname = fname[:-1] + str(i + 1)
-
-        grp = hf.create_group(fname)
-        dset1 = grp.create_dataset('Waveforms',
-                                   shape=(signals.shape),
-                                   dtype='f',
-                                   compression='gzip',
-                                   chunks=(1, signals.shape[1]))
-        dset2 = grp.create_dataset('SiPMSettings',
-                                   shape=(len(sipmsettings),),
-                                   dtype='f',
-                                   compression='gzip',
-                                   compression_opts=9)
+    with h5py.File(fname, 'a') as hf:
+        dset1 = hf.create_dataset('Waveforms',
+                                  shape=(signals.shape),
+                                  dtype='f',
+                                  compression='gzip',
+                                  chunks=(1, signals.shape[1]))
+        dset2 = hf.create_dataset('SiPMSettings',
+                                  shape=(len(sipmsettings),),
+                                  dtype='f',
+                                  compression='gzip',
+                                  compression_opts=9)
         dset1[...] = signals
         dset2[...] = sipmsettings

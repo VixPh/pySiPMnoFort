@@ -1,7 +1,5 @@
 # In this file I define all the global variables that I will use in other files.
-f = open('files/banner.txt')
-exec(f.read())
-
+import files.banner
 import argparse
 import importlib
 import multiprocessing
@@ -22,15 +20,17 @@ from matplotlib.ticker import MaxNLocator
 from numpy import cumsum, exp, hstack, sort, unique
 from numpy.random import choice, exponential, poisson, randint
 
-import ROOT
-
-if importlib.util.find_spec('cupy').loader is not None:
+if importlib.util.find_spec('cupy'):
     import cupy as cp
 else:
     print('Cupy not found, unable to run on GPU, will use CPU')
 
+matplotlib.use('Qt5Agg')
 plt.style.use('fast')
 plt.rc('lines', antialiased=False)
+
+warnings.simplefilter('always', DeprecationWarning)
+warnings.simplefilter('always', ImportWarning)
 
 
 ###############################################################################
@@ -67,7 +67,7 @@ global GPUMAX		# If there are more pe than this value swich back to CPU
 ###############################################################################
 # Signal parameters
 SIGLEN = 500        # in ns
-SAMPLING = 1        # in ns
+SAMPLING = 0.1      # in ns
 
 # SiPM parameters
 SIZE = 1			# in mm
@@ -85,9 +85,9 @@ BASESPREAD = 0.00
 CCGV = 0.05			# relative to single pe peack height (sigma)
 
 # Trigger parameters
-INTSTART = 20		# in ns
+INTSTART = 5		# in ns
 INTGATE = 300		# in ns
-PREG = 20			# in ns
+PREG = 0			# in ns
 
 # Simulation parameters
 FASTDCR = False
@@ -115,7 +115,7 @@ parser = argparse.ArgumentParser('pySiPM',
 parser._optionals.title = 'Options for the simulation'
 parser.add_argument('-H', '--help', action='help', default=argparse.SUPPRESS)
 parser.add_argument('-V', '--version', action='version',
-                    version='%(prog)s 0.1')
+                    version='%(prog)s 0.2')
 parser.add_argument('-d', '--device', nargs='?', type=str,
                     help='Select device for signal generation',
                     choices=['cpu', 'gpu'], default='cpu')
@@ -146,14 +146,16 @@ parser.add_argument('-D', '--clean', action='count',
                     help='Clear old output files')
 
 args = parser.parse_args()
-del epilog
-del description
 
-if importlib.util.find_spec('cupy').loader is not None:
+if importlib.util.find_spec('cupy') is None:
     args.device = 'cpu'
 
-if args.jobs is not None:
-    nJobs = args.jobs
+if args.jobs:
+    if isinstance(args.jobs,int):
+        nJobs = args.jobs
+    else:
+        warnings.warn(f'Invalid entry for number of jobs: {args.jobs}. Using only one', category=UserWarning)
+        nJobs = 1
 else:
     nJobs = multiprocessing.cpu_count()  # If not specified all cores are used
 
@@ -197,16 +199,17 @@ print('Initializing simulation on %d cores...\n' % (nJobs))
 if args.signal is None:
     print('Generating signals with the fast method on CPU (default)...')
 
-if args.signal is not None:
+if args.signal:
     if args.device is None:
         print('Generating signals on CPU')
-    if args.device is not None:
+    if args.device:
         print('Generating signals on ' + args.device.upper())
+        if args.device == 'gpu':
+            warnings.warn('Signal generation on GPU is deprecated... use CPU preferably',category=DeprecationWarning,stacklevel=3)
 
 if args.clean is not None:
     if os.path.exists('waveforms.hdf5'):
         os.remove('waveforms.hdf5')
-
 
 ###############################################################################
 #######################>>> NOT EDITABLE VARIABLES   <<<########################
@@ -221,7 +224,6 @@ TAUAPSLOW = np.float32(TAUAPSLOW / SAMPLING)
 SIGPTS = int(SIGLEN / SAMPLING)
 CELLSIDE = int(SIZE / (CELLSIZE * 1e-3))
 NCELL = int(CELLSIDE**2) - 1
-INTSTART = np.min(INTSTART, 0)
 if INTGATE + INTSTART > SIGLEN:
     warnings.warn(f'Integration gate of {INTGATE:.0f} ns exeeds signal length of {SIGLEN:.0f} ns',
                   category=UserWarning)

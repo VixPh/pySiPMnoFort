@@ -1,159 +1,162 @@
-pure subroutine signalgenfortran(s,t,h,tf,tr,sigpts,gvar)
+subroutine signalgenfortran(s, t, h, tf, tr, sigpts, gvar)
   implicit none
+  integer(4)  :: t, sigpts, i
+  real(4)     :: h, gvar, tf, tr, s(sigpts)
+!f2py intent(in) t, h, gvar, tf, tr, sigpts
+!f2py intent(out) s
 
-  integer(4),intent(in)  :: t,sigpts
-  real(4),intent(in)     :: h,gvar,tf,tr
-  real(4),intent(out)    :: s(sigpts)
-  integer(4)             :: i
-!f2py intent(in) t,sigpts,h,gvar,tf,tr
-!f2py intent(hide),depend(sigpts) s
-
-  s = 0
-  forall (i=t+1:min(sigpts,int(t+10*tf))) &
-    s(i) = (exp((t-i+1)/tf)-exp((t-i+1)/tr))
-  s = gvar*h*s
-
+  s = 0.
+  forall (i = 1 : min(sigpts - t, int(10 * tf - t)))
+    s(i + t) = exp(-i / tf) - exp(-i / tr)
+  end forall
+  s = gvar * h * s
 end subroutine signalgenfortran
 
 
-pure subroutine rollfortran(vecto,vect,t,gvar,h,npt)
+subroutine rollfortran(out, vect, t, gvar, h, npt)
   implicit none
+  integer(4)     :: t, npt
+  real(4)        :: gvar, h, vect(npt), out(npt)
+!f2py intent(in) t, gvar, h, vect
+!f2py intent(hide), depend(vect) npt = len(vect)
+!f2py intent(out) out
 
-  integer(4),intent(in)     :: t,npt
-  real(4),intent(in)        :: gvar,h,vect(npt)
-  real(4),intent(out)       :: vecto(npt)
-
-!f2py intent(in) npt,t,gvar,h
-!f2py intent(in),depend(npt) vect
-!f2py intent(hide),depend(npt) vecto
-
-  vecto = cshift(vect,-t,dim=1)
-  vecto = gvar*h*vecto
-  vecto(1:t) = 0
+  out = cshift(vect, -t, dim=1)
+  out(1 : t) = 0
+  out = gvar * h * out
 end subroutine rollfortran
 
 
-subroutine randintfortran(randout,ncells,nsig)
+module frandom
   implicit none
+  real(4), parameter, private  :: pi2 = 6.28318530718E+00
+contains
 
-  integer(4),intent(in)     :: ncells,nsig
-  integer(4),intent(out)    :: randout(nsig)
-  real(4)                   :: temp(nsig)
-  integer(4)                :: i
-!f2py intent(in) ncells,nsig
-!f2py intent(hide),depend(nsig) randout
-
-  call random_number(temp)
-  randout = nint(temp * ncells)
-
-end subroutine randintfortran
-
-
-subroutine randnfortran(vectout,mu,sigma,n)
+subroutine randint(out, sup, n)
   implicit none
+  integer(4)     :: sup, n, out(n)
+  real(4)        :: u(n)
+!f2py intent(in) ncells, nsig
+!f2py intent(out) out
 
-  real(4),intent(in)    :: mu,sigma
-  integer(4),intent(in) :: n
-  real(4),intent(out)   :: vectout(n)
-  real(4)               :: temp(n)
-  real (4), parameter   :: pi = 3.141592653589793E+00
-!f2py intent(in) mu,sigma,n
-!f2py intent(hide),depend(n) vectout
+  call random_number(u)
+  out = floor(sup * u) + 1
+end subroutine randint
 
-  call random_number(vectout)
+
+subroutine randn(out, mu, sigma, n)
+  implicit none
+  integer(4)          :: n
+  real(4)             :: mu, sigma, out(n), temp(n)
+!f2py intent(in) mu, sigma, n
+!f2py intent(out) out
+
+  call random_number(out)
   call random_number(temp)
 
-  where ( vectout < tiny(vectout) ) vectout = tiny(vectout)
+  if (any(out .lt. tiny(out))) then
+    where (out .lt. tiny(out)) out = tiny(out)
+  end if
 
-  vectout = sqrt( - 2.0E+00 * log(vectout))*cos( 2.0E+00*pi*temp)*sigma+mu
+  out = sqrt( -2.0E+00 * log(out)) * cos(pi2 * temp) * sigma + mu
+end subroutine randn
 
-end subroutine randnfortran
 
-
-subroutine randpoissfortran(vectout,mu,n)
+subroutine randpoiss(out, mu, n)
   implicit none
-
-  integer(4),intent(in)     :: n
-  real(4),intent(in)        :: mu
-  integer(4),intent(out)    :: vectout(n)
-  real(4)                   :: L,p(n),u
-  integer(4)                :: i,j
-!f2py intent(in) mu,n
-!f2py intent(hide),depend(n) vectout
+  integer(4)     :: n, out(n),i
+  real(4)        :: mu, L, p(n), u
+!f2py intent(in) mu, n
+!f2py intent(out) out
 
   L = exp(-mu)
-  vectout = 0
+  out = 0
   p = 1
-  call random_number(u)
+  i = 1
 
-  do i = 1, n
-    do while ( p(i) > L )
-      vectout(i) = vectout(i) + 1
+  do i=1,n
+    do while(p(i) .gt. L)
       call random_number(u)
-      p(i) = p(i)*u
+      out(i) = out(i) + 1
+      p(i) = p(i) * u
     end do
   end do
 
-  vectout = vectout - 1
 
-end subroutine
+  out = out - 1
+end subroutine randpoiss
 
 
-subroutine randexpfortran(vectout,mu,n)
+subroutine randexp(out, mu, n)
   implicit none
+  integer(4)   :: n
+  real(4)      :: mu, out(n)
+!f2py intent(in) mu, n
+!f2py intent(out) out
+
+  call random_number(out)
+  out = log(out)
+  out = -out * mu
+end subroutine randexp
+
+end module frandom
 
 
-  real(4),intent(in)      :: mu
-  integer(4),intent(in)   :: n
-  real(4),intent(out)     :: vectout(n)
-!f2py intent(in) mu,nd
-!f2py intent(hide),depend(n) vectout
-
-  call random_number(vectout)
-  vectout = log(1-vectout)*(-mu)
-
-end subroutine randexpfortran
-
-
-subroutine sortfortran(array)
+subroutine sortfortran(array,last)
   implicit none
+  integer(4)       :: i, j, left, right, last
+  real(4)          :: array(last)
+  real(4)          :: temp, p, next
+!f2py intent(inout) array
+!f2py intent(hide), depend(array) last = len(array)
 
-  real(4), intent(inout) :: array(:)
-  integer :: i,j,left,right,last
-  real(4) :: temp,p,next
-
-  last=size(array)
-
-  p=0.5*(array(1)+array(last))
-  if (array(1).gt.array(last)) then
-     temp=array(last)
-     array(last)=array(1)
-     array(1)=temp
+  p = 0.5 * (array(1) + array(last))
+  if (array(1) .gt. array(last)) then
+     temp = array(last)
+     array(last) = array(1)
+     array(1) = temp
   endif
 
-  left=1
-  right=last
-  temp=array(2)
+  left = 1
+  right = last
+  temp = array(2)
 
-  do i=2,last-1
-     if (temp.lt.p) then
-        do j=left,1,-1
-           if (array(j).le.temp) exit
-           array(j+1)=array(j)
+  do i = 2,last - 1
+     if (temp .lt. p) then
+        do j = left, 1, -1
+           if (array(j) .le. temp) exit
+           array(j + 1) = array(j)
         end do
-        array(j+1)=temp
-        temp=array(left+2)
-        left=left+1
+        array(j + 1) = temp
+        temp = array(left + 2)
+        left = left + 1
      else
-        next=array(right-1)
-        do j=right,last
-           if (array(j).ge.temp) exit
-           array(j-1)=array(j)
+        next = array(right - 1)
+        do j = right, last
+           if (array(j) .ge. temp) exit
+           array(j - 1) = array(j)
         end do
-        array(j-1)=temp
-        temp=next
-        right=right-1
+        array(j - 1) = temp
+        temp = next
+        right = right - 1
      endif
   end do
+end subroutine sortfortran
 
-  end subroutine sortfortran
+subroutine signalanalysisfortran(integral, peak, toa, tot, top, signalingate, sampling)
+
+  real(4)     :: signalingate(:), sampling
+  real(4)     :: integral, peak, toa, tot, top
+!f2py intent(in) signalingate(:), sampling
+!f2py intent(out) integral, peak, toa, tot, top
+
+  integral = sum(signalingate)
+  peak = maxval(signalingate)
+  toa = findloc(signalingate > 1.5, .true., dim = 1)
+  tot = count(signalingate > 1.5, dim = 1)
+  top = maxloc(signalingate, dim = 1)
+  integral = integral * sampling
+  toa = toa * sampling
+  tot = tot * sampling
+  top = top * sampling
+end subroutine signalanalysisfortran

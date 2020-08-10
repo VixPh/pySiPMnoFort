@@ -7,15 +7,20 @@ cur_system = platform.uname()
 nversion = 'Not Installed'
 cpversion = 'Not Installed'
 rootversion = 'Not Installed'
-if importlib.util.find_spec('numba'):
-  import numba
-  nversion = numba.__version__
+if importlib.util.find_spec('numpy'):
+  import numpy
+  nversion = numpy.__version__
 if importlib.util.find_spec('cupy'):
   import cupy
   cpversion = cupy.__version__
 if importlib.util.find_spec('ROOT'):
   from ROOT import gROOT
   rootversion = gROOT.GetVersion()
+    
+assert importlib.util.find_spec('numpy'), 'Numpy is needed, please install using: pip install numpy'
+assert importlib.util.find_spec('matplotlib'), 'Matplotlib is needed, please install using: pip install matplotlib'
+assert importlib.util.find_spec('h5py'), 'H5py is needed, please install using: pip install h5py'
+assert importlib.util.find_spec('uproot'), 'Uproot is needed, please install using: pip install uproot'
 
 s1=f'''.__________________________________________________.
 |                    ._____ _ .____  .__  __.      |
@@ -31,7 +36,7 @@ s2=f'''|
 |Python version: {implementation}  {version}
 |C compiler: {compiler}
 |Cern ROOT version: {rootversion}
-|Numba version:  {nversion}
+|Numpy version:  {nversion}
 |Cupy version: {cpversion}'''
 s3='''|
 |The IDEA collaboration:
@@ -49,7 +54,3 @@ for l in s3.splitlines():
     text = '|'+l[1:].strip().center(50)+'|'
     print(text)
 print('|'+'_'*50+'|')
-
-
-for name in dir():
-  del globals()[name]

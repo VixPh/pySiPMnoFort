@@ -1,4 +1,4 @@
-# In this file I define all the functions I will use in the main file of simulation
+#In this file I define all the functions I will use in the main file of simulation
 from libs.FortranFunctions import signalgenfortran
 from variables import *
 
@@ -44,19 +44,19 @@ def PulseGPU(t, h):
     gainvar = cp.random.normal(1, CCGV, (n, 1), dtype='float32')
     h = h[:, None].astype('float32')    # Transpose array of height values
     # Call kernel to generate singal
-    sig = normpe * cp.sum(signalShapeGPU(vect, TFALL, TRISE, gainvar, h), axis=0)
+    sig = cp.sum(signalShapeGPU(vect, TFALL, TRISE, gainvar, h), axis=0)
     # If there are afterpulses generate theyr signals
     if nap:
         apdel = cp.random.exponential(TAUAPFAST, nap, dtype='float32') + cp.random.exponential(TAUAPSLOW, nap, dtype='float32')
         # Select wich signals will have ap
         apSig = randint(0, n, dtype='int32')
-        tap = (apdel / sampling).astype('int32') + t[apSig]
+        tap = (apdel / SAMPLING).astype('int32') + t[apSig]
         hap = 1 - cp.exp(-apdel / TFALL)  # Pulse height as RC circuit
         hap = hap[:, None].astype('float32')
         gainvar = cp.random.normal(1, CCGV, (nap, 1), dtype='float32')
         vect = (cp.arange(SIGPTS, dtype='int32') + cp.zeros((nap, 1), dtype='int32') - tap[:, None])
         vect[vect < 0] = 0
-        sig += normpe * cp.sum(signalShapeGPU(vect, TFALL, TRISE, gainvar, hap), axis=0)
+        sig += cp.sum(signalShapeGPU(vect, TFALL, TRISE, gainvar, hap), axis=0)
     return sig
 
 

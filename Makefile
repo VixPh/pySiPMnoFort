@@ -1,14 +1,11 @@
 CC := gcc
 FC := gfortran
-F2PY := f2py3.6
+F2PY := python3 -m numpy.f2py
 
 
-CF := "-Ofast -funroll-all-loops -fchecking"
+CF := "-Ofast -fomit-frame-pointer -march=native"
 
-FF := --opt="-Ofast -funroll-all-loops -fopt-info -fchecking \
--save-temps -dA -std=f2008"
-
-GFF := -Ofast -funroll-all-loops -ffast-math -fchecking
+FF := --opt="-Ofast -std=f2008 -fomit-frame-pointer -march=native -mavx -mavx2"
 
 
 SRCDIR := src/
@@ -27,7 +24,7 @@ all: build | clear
 
 build:
 	@echo "Building $(MODULE) module"
-	$(F2PY) -c $(FF) -m $(MODULE) $(SRCDIR)FortranFunctions.f90
+	$(F2PY) -c $(FF)  --no-wrap-functions -m $(MODULE) $(SRCDIR)FortranFunctions.f90
 
 clear:
-	@mv $(MODULE).* $(LIBDIR)$
+	@mv $(MODULE).* $(LIBDIR)

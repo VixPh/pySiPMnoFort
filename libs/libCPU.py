@@ -1,5 +1,6 @@
 # In this file I define all the functions I will use in the main file of simulation
-from libs.FortranFunctions import signalgenfortran, randnfortran
+from libs.FortranFunctions import rollfortran, signalgenfortran, sortfortran
+from libs.FortranFunctions import frandom
 from variables import *
 
 ###############################################################################
@@ -29,12 +30,11 @@ def PulseCPU(t, h, gainvar, nap):
     s : np.ndarray
             Array containing the generated cell signal
     """
-
     sig = signalgenfortran(t, h, TFALL, TRISE, SIGPTS, gainvar)    # Calculate signal
     if nap > 0:  # If there are afterpulses generate theyr signals
         for _ in range(nap):
             # APs have a time delay exponential distribution
-            apdel = random.expovariate(1 / TAUAPFAST) + random.expovariate(1 / TAUAPSLOW)
+            apdel = frandom.randexp(TAUAPFAST, 1) + frandom.randexp(TAUAPSLOW, 1)
             tap = np.int32(apdel / SAMPLING + t)
             hap = 1 - exp(-apdel / TFALL)
             sig += signalgenfortran(tap, hap, TFALL, TRISE, SIGPTS, gainvar)
@@ -68,9 +68,9 @@ def SiPMSignalAction(times, sigH, SNR, BASESPREAD):
 
     baseline = random.gauss(0, BASESPREAD)  # Add a baseline to the signal
     # Start with gaussian noise
-    signal = randnfortran(baseline, SNR, SIGPTS)
-    gainvars = randnfortran(1, CCGV, times.size)   # Each signal has a ccgv
-    naps = poisson(AP,size=times.size)   # Generate number of afterpulses
+    signal = frandom.randn(baseline, SNR, SIGPTS)
+    gainvars = frandom.randn(1, CCGV, times.size)   # Each signal has a ccgv
+    naps = frandom.randpoiss(AP, times.size)   # Generate number of afterpulses
     for i in range(times.size):
         signal += PulseCPU(times[i], sigH[i], gainvars[i], naps[i])
     return(signal)

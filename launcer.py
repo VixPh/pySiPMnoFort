@@ -1,21 +1,36 @@
 from main import *
 
-pool = Pool(processes = nJobs, initializer = initializeRandomPool)
-res = [None] * 50
+fname = '../Data/out.txt'
+f = open(fname)
+lines = f.readlines()
 
+TIMES = []
+OTHER = []
+print('Reading input file')
+for l in lines:
+    if not l.strip():
+        continue
+    L = l.split()
+    TIMES.append(np.array(L[6:], dtype='float32'))
+    OTHER.append((*L[:6],))
+    if int(L[0]) % 1000 == 0:
+        print(f'Reading event: {L[0]}')
+NEVTS = int(L[0])
+
+pool = Pool(processes=nJobs, initializer=initializeRandomPool)
+res = [None] * NEVTS
+
+print('Starting simulation')
 Ts = time.time()
-for i in range(50):
-    times = np.ones(np.random.poisson(25)) + 30
-    other = (i)
-    # SiPM(np.array(times),other)
-    res[i] = pool.apply_async(SiPM, args=(times, other))
+for i in range(NEVTS):
+    res[i] = pool.apply_async(SiPM, args=(TIMES[i], OTHER[i]))
 pool.close()
 pool.join()
 Te = time.time()
-print(f'Execution time: {50/(Te-Ts):.2f}s')
+print('Simulation finished')
+print(f'Execution time: {(Te-Ts):.2f}s')
 
-
-output = np.empty((len(res), 5))
+output = np.empty((len(res), 5), dtype='float32')
 if args.wavedump:
     signals = np.empty((len(res), SIGPTS), dtype='float32')
 
@@ -32,7 +47,6 @@ peak = output[:, 1]
 tstart = output[:, 2]
 tover = output[:, 3]
 ptime = output[:, 4]
-
 
 if args.graphics:
     somestats(output)
