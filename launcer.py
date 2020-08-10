@@ -1,20 +1,22 @@
 from main import *
+from tqdm import tqdm
 
-fname = '../Data/out.txt'
+fname = '/tmp/out.txt'
 f = open(fname)
 lines = f.readlines()
 
 TIMES = []
 OTHER = []
 print('Reading input file')
+pbar = tqdm(total=len(lines))
 for l in lines:
     if not l.strip():
         continue
     L = l.split()
     TIMES.append(np.array(L[6:], dtype='float32'))
     OTHER.append((*L[:6],))
-    if int(L[0]) % 1000 == 0:
-        print(f'Reading event: {L[0]}')
+    pbar.update(1)
+pbar.close()
 NEVTS = int(L[0])
 
 pool = Pool(processes=nJobs, initializer=initializeRandomPool)
