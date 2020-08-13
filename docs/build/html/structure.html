@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Files Structure &mdash; pySiPM 0.1 documentation</title>
+  <title>Files Structure &mdash; pySiPM 0.2 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,10 +34,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Setup" href="setup.html" />
@@ -50,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> pySiPM
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> pySiPM
           
 
           
@@ -76,6 +77,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -116,6 +118,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -154,7 +157,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Files Structure</li>
     
@@ -192,22 +195,22 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>times</strong> (<em>np.ndarray</em>) – This array contains the arriving time of each photon on the SiPM sensor surface.</p></li>
-<li><p><strong>array is the input of the simulation.</strong> (<em>This</em>) – </p></li>
-<li><p><strong>other</strong> (<em>tuple</em>) – This variable may contain other informations about the event generated.</p></li>
-<li><p><strong>can be the event id</strong><strong>, </strong><strong>the arriving time inserted in the simulation</strong> (<em>It</em>) – </p></li>
-<li><p><strong>the real number of photons inserted in the simulation.</strong> (<em>or</em>) – </p></li>
-<li><p><strong>tuple will be copied as it is in the output.</strong> (<em>This</em>) – </p></li>
+<li><p><strong>times</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – This array contains the arriving time of each photon on the SiPM sensor surface.
+This array is the input of the simulation.</p></li>
+<li><p><strong>other</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – This variable may contain other informations about the event generated.
+It can be the event id, the arriving time inserted in the simulation
+or the real number of photons inserted in the simulation.
+This tuple will be copied as it is in the output.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>integral</strong> (<em>double</em>) – The integral of the signal calculated in the integration gate</p></li>
-<li><p><strong>peak</strong> (<em>double</em>) – The height of the signal in the integration gate</p></li>
-<li><p><strong>tstart</strong> (<em>double</em>) – The time of arrival of the signal in ns defined as the first sample over the threshld of 1.5</p></li>
-<li><p><strong>other</strong> (<em>tuple</em>) – The copy of the <cite>other</cite> variable given in the input</p></li>
-<li><p><strong>signal</strong> (<em>np.ndarray(float32)</em>) – If the options -W is enabled the complete SiPM signal will be passed in the output.</p></li>
-<li><p><em>Otherwise this output is None</em></p></li>
+<li><p><strong>integral</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">double</span></code>) – The integral of the signal calculated in the integration gate</p></li>
+<li><p><strong>peak</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">double</span></code>) – The height of the signal in the integration gate</p></li>
+<li><p><strong>tstart</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">double</span></code>) – The time of arrival of the signal in ns defined as the first sample over the threshld of 1.5</p></li>
+<li><p><strong>other</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – The copy of the <cite>other</cite> variable given in the input</p></li>
+<li><p><strong>signal</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray(float32)</span></code>) – If the options -W is enabled the complete SiPM signal will be passed in the output.
+Otherwise this output is None</p></li>
 </ul>
 </p>
 </dd>
@@ -227,35 +230,35 @@
 <ul class="simple">
 <li><p>SiPM Settings:</p>
 <ul>
-<li><p><code class="code docutils literal notranslate"><span class="pre">size</span> <span class="pre">=</span> <span class="pre">1</span></code> Size of the SiPM sensitive area in mm (side)</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">cellsize</span> <span class="pre">=</span> <span class="pre">25</span></code> Pitch of a single sensitive cell in um</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">dcr</span> <span class="pre">=</span> <span class="pre">200e3</span></code> Dark count rate in kHz</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">xt</span> <span class="pre">=</span> <span class="pre">0.03</span></code> Optical crosstalk probability</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">ap</span> <span class="pre">=</span> <span class="pre">0.02</span></code> Afterpulsing probability</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">trise</span> <span class="pre">=</span> <span class="pre">1</span></code> Rising time of the signal in ns</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">tfall</span> <span class="pre">=</span> <span class="pre">50</span></code> Falling time of the signal in ns</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">cellrecovery</span> <span class="pre">=</span> <span class="pre">20</span></code> Recovery time of the single SiPM cell in ns</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">tauapfast</span> <span class="pre">=</span> <span class="pre">15</span></code> Time constant of afterpulses delay in ns (fast component)</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">tauapslow</span> <span class="pre">=</span> <span class="pre">85</span></code> Time constant of afterpulses delay in ns (slow component)</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">ccgv</span> <span class="pre">=</span> <span class="pre">0.05</span></code> Cell to cell gain variation (sigma)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">SIZE</span> <span class="pre">=</span> <span class="pre">1</span></code> Size of the SiPM sensitive area in mm (side)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">CELLSIZE</span> <span class="pre">=</span> <span class="pre">25</span></code> Pitch of a single sensitive cell in um</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">DCR</span> <span class="pre">=</span> <span class="pre">200e3</span></code> Dark count rate in kHz</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">XT</span> <span class="pre">=</span> <span class="pre">0.03</span></code> Optical crosstalk probability</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">AP</span> <span class="pre">=</span> <span class="pre">0.02</span></code> Afterpulsing probability</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">TRISE</span> <span class="pre">=</span> <span class="pre">1</span></code> Rising time of the signal in ns</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">TFALL</span> <span class="pre">=</span> <span class="pre">50</span></code> Falling time of the signal in ns</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">CELLRECOVERY</span> <span class="pre">=</span> <span class="pre">20</span></code> Recovery time of the single SiPM cell in ns</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">TAUAPFAST</span> <span class="pre">=</span> <span class="pre">15</span></code> Time constant of afterpulses delay in ns (fast component)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">TAUAPSLOW</span> <span class="pre">=</span> <span class="pre">85</span></code> Time constant of afterpulses delay in ns (slow component)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">CCGV</span> <span class="pre">=</span> <span class="pre">0.05</span></code> Cell to cell gain variation (sigma)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">SNR</span> <span class="pre">=</span> <span class="pre">30</span></code> Signal to noise ratio</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">basespread</span> <span class="pre">=</span> <span class="pre">0</span></code> Spread of the baseline of the signal (sigma)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">BASESPREAD</span> <span class="pre">=</span> <span class="pre">0</span></code> Spread of the baseline of the signal (sigma)</p></li>
 </ul>
 </li>
 <li><p>Signal analysis settings:</p>
 <ul>
-<li><p><code class="code docutils literal notranslate"><span class="pre">siglen</span> <span class="pre">=</span> <span class="pre">500</span></code> Total length of the signal in ns</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">sampling</span> <span class="pre">=</span> <span class="pre">0.1</span></code> Samlping time in ns (1 = 1ns, 0.1 = 100ps)</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">intstart</span> <span class="pre">=</span> <span class="pre">20</span></code> Start of the integration gate in ns</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">intgate</span> <span class="pre">=</span> <span class="pre">300</span></code> Length of the integration gate in ns</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">pregate</span> <span class="pre">=</span> <span class="pre">20</span></code> Length of the pregate</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">SIGLEN</span> <span class="pre">=</span> <span class="pre">500</span></code> Total length of the signal in ns</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">SAMPLING</span> <span class="pre">=</span> <span class="pre">0.1</span></code> Samlping time in ns (1 = 1ns, 0.1 = 100ps)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">INTSTART</span> <span class="pre">=</span> <span class="pre">20</span></code> Start of the integration gate in ns</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">INTGATE</span> <span class="pre">=</span> <span class="pre">300</span></code> Length of the integration gate in ns</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">PREGATE</span> <span class="pre">=</span> <span class="pre">20</span></code> Length of the pregate</p></li>
 </ul>
 </li>
 <li><p>Simulation settings:</p>
 <ul>
-<li><p><code class="code docutils literal notranslate"><span class="pre">fastDCR</span> <span class="pre">=</span> <span class="pre">False</span></code> Enables faster generation of dark count events</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">fastXT</span> <span class="pre">=</span> <span class="pre">False</span></code>  Enable faster generation of crosstalk events</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">fastSIG</span> <span class="pre">=</span> <span class="pre">True</span></code>  Enables faster computation of signals</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">FASTDCR</span> <span class="pre">=</span> <span class="pre">False</span></code> Enables faster generation of dark count events</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">FASTXT</span> <span class="pre">=</span> <span class="pre">False</span></code>  Enable faster generation of crosstalk events</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">FASTSIG</span> <span class="pre">=</span> <span class="pre">True</span></code>  Enables faster computation of signals</p></li>
 </ul>
 </li>
 </ul>
@@ -276,13 +279,13 @@
 <dd><p>Function that generates times of dcr events.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>rate</strong> (<em>double</em>) – Rate of dcr in kHz</p>
+<dd class="field-odd"><p><strong>rate</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">double</span></code>) – Rate of dcr in kHz</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>dcrTime</strong> – Array containing dcr times</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -290,19 +293,20 @@
 <dl class="py function">
 <dt id="libs.lib.SiPMEventAction">
 <code class="sig-prename descclassname">libs.lib.</code><code class="sig-name descname">SiPMEventAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span></em>, <em class="sig-param"><span class="n">XT</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/lib.html#SiPMEventAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.lib.SiPMEventAction" title="Permalink to this definition">¶</a></dt>
-<dd><p>evtsGen(time,xt)</p>
+<dd><p>evtsGen(time,XT)</p>
 <p>Function that calculates signal height for each SiPM cell and adds optical crosstalk events.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>time</strong> (<em>np.ndarray</em>) – Array containing the time at which SiPM cells are fired</p></li>
-<li><p><strong>XT</strong> (<em>double</em>) – Value of optical crosstalk probability</p></li>
+<li><p><strong>time</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Array containing the time at which SiPM cells are fired</p></li>
+<li><p><strong>XT</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">double</span></code>) – Value of optical crosstalk probability</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>evtTimes</strong> (<em>np.ndarray(int32)</em>) – Array containing the time at wich SiPM cells are fired, including xt events (sorted)</p></li>
-<li><p><strong>sigH</strong> (<em>np.ndarray(float32)</em>) – Array containing the pulse height of each fired SiPM cell</p></li>
+<li><p><strong>evtTimes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray(int32)</span></code>) – Array containing the time at wich SiPM cells are fired, including xt events (sorted)</p></li>
+<li><p><strong>sigH</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray(float32)</span></code>) – Array containing the pulse height of each fired SiPM cell</p></li>
+<li><p><strong>idx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray(int16)</span></code>) – Array containing the unique index of the hitted cells</p></li>
 </ul>
 </p>
 </dd>
@@ -311,45 +315,48 @@
 
 <dl class="py function">
 <dt id="libs.lib.SiPMSignalAction">
-<code class="sig-prename descclassname">libs.lib.</code><code class="sig-name descname">SiPMSignalAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">sigH</span></em>, <em class="sig-param"><span class="n">SNR</span></em>, <em class="sig-param"><span class="n">BASESPREAD</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libGPU.html#SiPMSignalAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.lib.SiPMSignalAction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libs.lib.</code><code class="sig-name descname">SiPMSignalAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">sigH</span></em>, <em class="sig-param"><span class="n">SNR</span></em>, <em class="sig-param"><span class="n">BASESPREAD</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/lib.html#SiPMSignalAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.lib.SiPMSignalAction" title="Permalink to this definition">¶</a></dt>
 <dd><p>signalGen(times,sigH,SNR,BASESPREAD)</p>
-<p>Function that passes signal height and times to the main function that generates signals. Also adds noise.
-If the number of signals to generate is small uses CPU, else uses GPU to speed up the computation.</p>
+<p>Function that passes signal height and times to the main function that
+generates single signals. Also adds noise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>times</strong> (<em>np.ndarray</em><em>(</em><em>int32</em><em>)</em>) – Array containing the time at wich SiPM cells are fired, including xt events (sorted)</p></li>
-<li><p><strong>sigH</strong> (<em>np.ndarray</em><em>(</em><em>float32</em><em>)</em>) – Array containing the pulse height of each fired SiPM cell</p></li>
-<li><p><strong>SNR</strong> (<em>double</em>) – The signal to noise ratio of the noise to add</p></li>
-<li><p><strong>BASESPREAD</strong> (<em>double</em>) – Sigma of the value to add as baseline</p></li>
+<li><p><strong>times</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray(int32)</span></code>) – Array containing the time at wich SiPM cells are fired, including xt events (sorted)</p></li>
+<li><p><strong>sigH</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray(float32)</span></code>) – Array containing the pulse height of each fired SiPM cell</p></li>
+<li><p><strong>SNR</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">double</span></code>) – The signal to noise ratio of the noise to add</p></li>
+<li><p><strong>BASESPREAD</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">double</span></code>) – Sigma of the value to add as baseline</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>signal</strong> – Array containing the generated SiPM signal</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="libs.lib.PulseCPU">
-<code class="sig-prename descclassname">libs.lib.</code><code class="sig-name descname">PulseCPU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libGPU.html#PulseCPU"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.lib.PulseCPU" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">libs.lib.</code><code class="sig-name descname">PulseCPU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/lib.html#PulseCPU"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.lib.PulseCPU" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function that generates the signal from a single SiPM cell.
-This is the “full” version that computes the signal shape on CPU by evaluating the signal shape function.</p>
+This is the “fast” version that uses a pre-computed signal
+shape and translates it in time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>int32</em>) – Time at which the cell is triggered</p></li>
-<li><p><strong>h</strong> (<em>float32</em>) – The relative pulse height of the cell signal</p></li>
+<li><p><strong>t</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int32</span></code>) – Time at which the cell is triggered</p></li>
+<li><p><strong>h</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float32</span></code>) – The relative pulse height of the cell signal</p></li>
+<li><p><strong>gainvar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float32</span></code>) – Value of cell to cell gain variation for this signal</p></li>
+<li><p><strong>nap</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int32</span></code>) – Number of afterpulses in this signal</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>s</strong> – Array containing the generated cell signal</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -361,10 +368,10 @@ This is the “full” version that computes the signal shape on CPU by evaluati
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>signal</strong> (<em>np.ndarray</em>) – Array containing the generated SiPM signal</p></li>
-<li><p><strong>sigTimes</strong> (<em>np.ndarray</em>) – Array containing all photons events times (including xt)</p></li>
-<li><p><strong>dcrTime</strong> (<em>np.ndarray</em>) – Array containing dcr events times</p></li>
-<li><p><strong>dev</strong> (<em>str</em>) – String that describes the device on which the signal is computed</p></li>
+<li><p><strong>signal</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Array containing the generated SiPM signal</p></li>
+<li><p><strong>sigTimes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Array containing all photons events times (including xt)</p></li>
+<li><p><strong>dcrTime</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Array containing dcr events times</p></li>
+<li><p><strong>dev</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – String that describes the device on which the signal is computed</p></li>
 </ul>
 </dd>
 </dl>
@@ -382,7 +389,7 @@ This is the “full” version that computes the signal shape on CPU by evaluati
 <dd><p>Function that displays histograms of generated events</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>output</strong> (<em>np.ndarray</em>) – Array containing output of the simulation.
+<dd class="field-odd"><p><strong>output</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>) – Array containing output of the simulation.
 This array contains the integral,
 peak and starting time in the first three columns.</p>
 </dd>
@@ -402,23 +409,24 @@ peak and starting time in the first three columns.</p>
 </div>
 <dl class="py function">
 <dt id="libs.libCPU.SiPMSignalAction">
-<code class="sig-prename descclassname">libs.libCPU.</code><code class="sig-name descname">SiPMSignalAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">sigH</span></em>, <em class="sig-param"><span class="n">SNR</span></em>, <em class="sig-param"><span class="n">basespread</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libCPU.html#SiPMSignalAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libCPU.SiPMSignalAction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that passes signal height and times to the main function that generates single signals.
-Also adds noise.</p>
+<code class="sig-prename descclassname">libs.libCPU.</code><code class="sig-name descname">SiPMSignalAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">sigH</span></em>, <em class="sig-param"><span class="n">SNR</span></em>, <em class="sig-param"><span class="n">BASESPREAD</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libCPU.html#SiPMSignalAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libCPU.SiPMSignalAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>signalGen(times,sigH,SNR,BASESPREAD)</p>
+<p>Function that passes signal height and times to the main function that
+generates single signals. Also adds noise.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>times</strong> (<em>np.ndarray</em><em>(</em><em>int32</em><em>)</em>) – Array containing the time at wich SiPM cells are fired, including xt events (sorted)</p></li>
-<li><p><strong>sigH</strong> (<em>np.ndarray</em><em>(</em><em>float32</em><em>)</em>) – Array containing the pulse height of each fired SiPM cell</p></li>
-<li><p><strong>SNR</strong> (<em>double</em>) – The signal to noise ratio of the noise to add</p></li>
-<li><p><strong>basespread</strong> (<em>double</em>) – Sigma of the value to add as baseline</p></li>
+<li><p><strong>times</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray(int32)</span></code>) – Array containing the time at wich SiPM cells are fired, including xt events (sorted)</p></li>
+<li><p><strong>sigH</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray(float32)</span></code>) – Array containing the pulse height of each fired SiPM cell</p></li>
+<li><p><strong>SNR</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">double</span></code>) – The signal to noise ratio of the noise to add</p></li>
+<li><p><strong>BASESPREAD</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">double</span></code>) – Sigma of the value to add as baseline</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>signal</strong> – Array containing the generated SiPM signal</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -431,15 +439,17 @@ This is the “full” version that computes the signal shape on CPU by evaluati
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>int32</em>) – Time at which the cell is triggered</p></li>
-<li><p><strong>h</strong> (<em>float32</em>) – The relative pulse height of the cell signal</p></li>
+<li><p><strong>t</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int32</span></code>) – Time at which the cell is triggered</p></li>
+<li><p><strong>h</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float32</span></code>) – The relative pulse height of the cell signal</p></li>
+<li><p><strong>gainvar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float32</span></code>) – Value of cell to cell gain variation for this signal</p></li>
+<li><p><strong>nap</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int32</span></code>) – Number of afterpulses in this signal</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>s</strong> – Array containing the generated cell signal</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -451,73 +461,6 @@ This is the “full” version that computes the signal shape on CPU by evaluati
 <div class="line">This file contains the functions used to compute the SiPM signal using the GPU.</div>
 <div class="line">Here is a brief description of all the functions with their signature.</div>
 </div>
-<dl class="py function">
-<dt id="libs.libGPU.SiPMSignalAction">
-<code class="sig-prename descclassname">libs.libGPU.</code><code class="sig-name descname">SiPMSignalAction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">times</span></em>, <em class="sig-param"><span class="n">sigH</span></em>, <em class="sig-param"><span class="n">SNR</span></em>, <em class="sig-param"><span class="n">BASESPREAD</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libGPU.html#SiPMSignalAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libGPU.SiPMSignalAction" title="Permalink to this definition">¶</a></dt>
-<dd><p>signalGen(times,sigH,SNR,BASESPREAD)</p>
-<p>Function that passes signal height and times to the main function that generates signals. Also adds noise.
-If the number of signals to generate is small uses CPU, else uses GPU to speed up the computation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>times</strong> (<em>np.ndarray</em><em>(</em><em>int32</em><em>)</em>) – Array containing the time at wich SiPM cells are fired, including xt events (sorted)</p></li>
-<li><p><strong>sigH</strong> (<em>np.ndarray</em><em>(</em><em>float32</em><em>)</em>) – Array containing the pulse height of each fired SiPM cell</p></li>
-<li><p><strong>SNR</strong> (<em>double</em>) – The signal to noise ratio of the noise to add</p></li>
-<li><p><strong>BASESPREAD</strong> (<em>double</em>) – Sigma of the value to add as baseline</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>signal</strong> – Array containing the generated SiPM signal</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="libs.libGPU.PulseCPU">
-<code class="sig-prename descclassname">libs.libGPU.</code><code class="sig-name descname">PulseCPU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libGPU.html#PulseCPU"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libGPU.PulseCPU" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that generates the signal from a single SiPM cell.
-This is the “full” version that computes the signal shape on CPU by evaluating the signal shape function.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>int32</em>) – Time at which the cell is triggered</p></li>
-<li><p><strong>h</strong> (<em>float32</em>) – The relative pulse height of the cell signal</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>s</strong> – Array containing the generated cell signal</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="libs.libGPU.PulseGPU">
-<code class="sig-prename descclassname">libs.libGPU.</code><code class="sig-name descname">PulseGPU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">h</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/libs/libGPU.html#PulseGPU"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#libs.libGPU.PulseGPU" title="Permalink to this definition">¶</a></dt>
-<dd><p>PulseCPU(t,h)</p>
-<p>Function that generates the signal from all SiPM cells at once.
-This is the “full” version that computes the signal shape on GPU.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> (<em>np.ndarray</em><em>(</em><em>int32</em><em>)</em>) – Array containing times at which each the cell is triggered</p></li>
-<li><p><strong>h</strong> (<em>np.ndarray</em><em>(</em><em>float32</em><em>)</em>) – Array containing the relative pulse height of each cell signal</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>s</strong> – Array containing the generated SiPM signal</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>np.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
 </div>
 </div>
 <div class="section" id="other">
@@ -554,6 +497,7 @@ For an explanation on how to write and load an external configuration file see �
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Edoardo Proserpio
 
     </p>
@@ -568,7 +512,6 @@ For an explanation on how to write and load an external configuration file see �
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

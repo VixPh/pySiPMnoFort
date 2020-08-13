@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; pySiPM 0.1 documentation</title>
+  <title>Installation &mdash; pySiPM 0.2 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,10 +34,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Files Structure" href="structure.html" />
@@ -50,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> pySiPM
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> pySiPM
           
 
           
@@ -76,6 +77,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -104,6 +106,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -142,7 +145,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Installation</li>
     
@@ -234,10 +237,9 @@ sudo sh cuda_10.2.89_440.33.01_linux.run
 </pre></div>
 </div>
 <p>Shared libraries can be eventually compiled manually by using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>f2py3.6 -c --opts <span class="o">=</span> <span class="s1">&#39;-Ofast -march=native -mavx2&#39;</span> -m FortranFunctions FortranFunctions.f90
 </pre></div>
 </div>
-<p>f2py3.6 -c –opts = ‘-Ofast -funroll-all-loops -ffast-math -march=native -pipe’ -m FortranFunctions FortranFunctions.f90</p>
 </div>
 </div>
 
@@ -261,6 +263,7 @@ sudo sh cuda_10.2.89_440.33.01_linux.run
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2020, Edoardo Proserpio
 
     </p>
@@ -275,7 +278,6 @@ sudo sh cuda_10.2.89_440.33.01_linux.run
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

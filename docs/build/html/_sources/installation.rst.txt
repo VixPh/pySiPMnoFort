@@ -77,4 +77,4 @@ Shared libraries can be eventually compiled manually by using:
 
 .. code-block:: bash
 
-f2py3.6 -c --opts = '-Ofast -funroll-all-loops -ffast-math -march=native -pipe' -m FortranFunctions FortranFunctions.f90
+  f2py3.6 -c --opts = '-Ofast -march=native -mavx2' -m FortranFunctions FortranFunctions.f90
