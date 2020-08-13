@@ -1,11 +1,11 @@
 CC := gcc
 FC := gfortran
-F2PY := python3 -m numpy.f2py
+F2PY := f2py
 
 
-CF := "-Ofast -fomit-frame-pointer -march=native"
+CF := "-Ofast -fomit-frame-pointer -march=native -mavx2 -mno-fp-ret-in-387"
 
-FF := --opt="-Ofast -std=f2008 -fomit-frame-pointer -march=native -mavx -mavx2"
+FF := --opt="-Ofast -std=f2008 -fomit-frame-pointer -march=native -mavx2 -mno-fp-ret-in-387"
 
 
 SRCDIR := src/
@@ -18,13 +18,10 @@ MODULE := FortranFunctions
 export CFLAGS="$(CF)"
 
 
-.PHONY : build clear
-all: build | clear
-
+.PHONY : build
+all: build
 
 build:
 	@echo "Building $(MODULE) module"
 	$(F2PY) -c $(FF)  --no-wrap-functions -m $(MODULE) $(SRCDIR)FortranFunctions.f90
-
-clear:
 	@mv $(MODULE).* $(LIBDIR)

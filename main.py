@@ -51,7 +51,7 @@ def SiPM(times, other=None):
 
     # Select signal in the integration gate
     signalInGate = signal[INTSTART:INTSTART + INTGATE]
-    integral,peak,tstart,tovert,tpeak = signalanalysisfortran(signalInGate,SAMPLING)
+    integral, peak, tstart, tovert, tpeak = signalanalysisfortran(signalInGate, SAMPLING)
     # integral = signalInGate.sum() * SAMPLING
     # peak = signalInGate.max()
     # tstart = (signalInGate > 1.5).argmax() * SAMPLING
@@ -68,6 +68,6 @@ def SiPM(times, other=None):
             else:
                 dev = 'gpu'
         sigPlot(signal, sigTimes, dcrTime, dev, idx)
-    if args.wavedump is None:
+    if not args.wavedump:
         signal = None
-    return(integral, peak, tstart, tovert, tpeak, other, np.float32(signal))
+    return(integral, peak, tstart, tovert, tpeak, other, signal)

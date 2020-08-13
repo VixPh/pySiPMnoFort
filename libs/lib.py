@@ -67,6 +67,9 @@ def SiPMEventAction(time, XT):
     idx = -1
     evtTimes = []
     sigHtemp = []
+    if np.any(time > SIGLEN):
+        print('Detected events past the signal length, deleting them...')
+        time = time[time < SIGLEN]
     n = time.size
     if n > 0:
         idx = frandom.randint(NCELL, n)
@@ -375,7 +378,7 @@ def sigPlot(signal, sigTimes, dcrTime, dev, idx):
             ax = axlist[0]
             axm = axlist[1]
             if signal.max() > opened[current_core]:
-                opened[current_core] = signal.max()
+                opened[current_core] = True
 
     if opened[current_core]:
         line = ax.lines[-1]
@@ -384,9 +387,8 @@ def sigPlot(signal, sigTimes, dcrTime, dev, idx):
         txt = ax.text(0.5, 0.70, textstring, transform=ax.transAxes, fontsize=10)
 
         line.set_ydata(signal)
-        # ax.relim()
-        # ax.autoscale_view(tight=False, scalex=False, scaley=True)
-        ax.set_ylim(-1, opened[current_core] * 1.1)
+        ax.relim()
+        ax.autoscale_view(tight=False, scalex=False, scaley=True)
         img.set_data(sipmmatrix)
 
         plt.pause(float(args.Graphics)/1000)
@@ -403,7 +405,6 @@ def initializeRandomPool():
     # Get current core number (On MacOs psutil is not working)
     current_core = multiprocessing.current_process().name
     current_core = int(current_core.split('-')[-1])
-    time.sleep(0.5 / nJobs * current_core)
     # Get some random bits from the sistem entropy pool
     rngseed = struct.unpack('I', os.urandom(4))[0] + current_core
     random.seed(rngseed)   # Change rng seed for each worker
@@ -434,21 +435,29 @@ def SaveFile(fname, out, other=None):
     f['SiPMData']['ToT'].newbasket(tover)
 
     if other:
-        event = other[:, 0]
-        fiber = other[:, 1]
-        theta = other[:, 2]
-        phi = other[:, 3]
+        other = np.array(other)
+        event = np.int32(other[:, 0])
+        fibertype = other[:, 1] == 'Scin'
+        fiberid = np.int64(other[:, 2])
+        x = np.float32(other[:, 3])
+        y = np.float32(other[:, 4])
+        z = np.float32(other[:, 5])
 
         f['GeometryData'] = uproot.newtree(
-            {'EventId': 'int32',
-             'FiberId': 'int32',
-             'FiberTheta': 'float32',
-             'FiberPhi': 'float32'})
+            {'EventId': np.int32,
+             'FiberType': np.int8,
+             'FiberId': np.int64,
+             'FiberX': np.float32,
+             'FiberY': np.float32,
+             'FiberZ': np.float32})
 
         f['GeometryData']['EventId'].newbasket(event)
-        f['GeometryData']['FiberId'].newbasket(fiber)
-        f['GeometryData']['FiberTheta'].newbasket(theta)
-        f['GeometryData']['FiberPhi'].newbasket(phi)
+        f['GeometryData']['FiberType'].newbasket(fibertype)
+        f['GeometryData']['FiberId'].newbasket(fiberid)
+        f['GeometryData']['FiberX'].newbasket(x)
+        f['GeometryData']['FiberY'].newbasket(y)
+        f['GeometryData']['FiberZ'].newbasket(z)
+
 
 
 def SaveWaves(fname, signals):
@@ -475,7 +484,8 @@ def SaveWaves(fname, signals):
                                   shape=(signals.shape),
                                   dtype='f',
                                   compression='gzip',
-                                  chunks=(1, signals.shape[1]))
+                                  chunks=(1, signals.shape[1]),
+                                  compression_opts=9)
         dset2 = hf.create_dataset('SiPMSettings',
                                   shape=(len(sipmsettings),),
                                   dtype='f',

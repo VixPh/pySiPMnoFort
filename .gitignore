@@ -13,3 +13,4 @@
 *.hdf5
 *.npy
 *.npz
+/Visual
