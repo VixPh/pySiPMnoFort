@@ -151,7 +151,7 @@ if importlib.util.find_spec('cupy') is None:
     args.device = 'cpu'
 
 if args.jobs:
-    if isinstance(args.jobs,int):
+    if isinstance(args.jobs, int):
         nJobs = args.jobs
     else:
         warnings.warn(f'Invalid entry for number of jobs: {args.jobs}. Using only one', category=UserWarning)

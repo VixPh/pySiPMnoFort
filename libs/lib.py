@@ -64,12 +64,12 @@ def SiPMEventAction(time, XT):
             Array containing the unique index of the hitted cells
     """
 
-    idx = -1
     evtTimes = []
     sigHtemp = []
     if np.any(time > SIGLEN):
-        print('Detected events past the signal length, deleting them...')
         time = time[time < SIGLEN]
+    if FASTSIG and np.any(time > (INTSTART + INTGATE) * SAMPLING):
+        time = time[time < (INTSTART + INTGATE) * SAMPLING]
     n = time.size
     if n > 0:
         idx = frandom.randint(NCELL, n)
@@ -128,7 +128,7 @@ def SiPMEventAction(time, XT):
         evtTimes = np.empty(0)
         sigH = np.empty(0)
 
-    return(np.int32(evtTimes), np.float32(sigH), idx)
+    return(np.int32(evtTimes), np.float32(sigH))
 
 
 ### GENERATION OF SIGNALS SHAPES FAST ###
@@ -309,7 +309,7 @@ def somestats(output, realpe=None):
 
 drawn = [False] * nJobs
 opened = [True] * nJobs
-def sigPlot(signal, sigTimes, dcrTime, dev, idx):
+def sigPlot(signal, sigTimes, dcrTime, dev):
     """
     sigPlot(signal,sigTimes,dcrTime,dev)
 
@@ -333,24 +333,16 @@ def sigPlot(signal, sigTimes, dcrTime, dev, idx):
     else:
         current_core = int(current_core.split('-')[-1]) - 1
 
-    sipmmatrix = np.zeros((CELLSIDE, CELLSIDE), dtype='bool')
-
-    if np.any(idx >= 0):
-        times = sigTimes / SAMPLING
-        rows = (idx // CELLSIDE) % CELLSIDE
-        cols = (idx % CELLSIDE) % CELLSIDE
-        sipmmatrix[rows, cols] = True
-
     textstring = f"Core: {current_core:d}\n"
     textstring += f"Device: {dev:s}\n"
     textstring += f"Photons:{sigTimes.size-dcrTime.size:d} Dcr:{dcrTime.size:d}\n"
     if not drawn[current_core]:
         timearray = np.arange(SIGPTS) * SAMPLING
-        ax = plt.subplot(211)
+        ax = plt.subplot(111)
         screenx = 1920
         screeny = 1080
         xsize = int(screenx / 6)
-        ysize = int(screeny / 2)
+        ysize = int(screeny / 3)
         xpos = (current_core % 6) * xsize
         ypos = ((current_core // 6) % 3) * ysize
         plt.get_current_fig_manager().window.setGeometry(xpos, ypos, xsize, ysize)
@@ -363,33 +355,22 @@ def sigPlot(signal, sigTimes, dcrTime, dev, idx):
         ax.grid(linestyle=':')
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         drawn[current_core] = True
-
-        axm = plt.subplot(212)
-        axm.set_axis_off()
-        plt.subplots_adjust(left=0.1, bottom=0.01, right=0.99,
-                            top=0.99, wspace=0.05, hspace=0.15)
         ax.plot(timearray, signal, '-b', linewidth=0.5)
-        axm.matshow(sipmmatrix, aspect='equal', filternorm=False, resample=False, cmap='binary_r')
     else:
         axlist = plt.gcf().axes
         if len(axlist) == 0:
             opened[current_core] = False
         if opened[current_core]:
             ax = axlist[0]
-            axm = axlist[1]
-            if signal.max() > opened[current_core]:
-                opened[current_core] = True
 
     if opened[current_core]:
         line = ax.lines[-1]
-        img = axm.get_images()[0]
 
         txt = ax.text(0.5, 0.70, textstring, transform=ax.transAxes, fontsize=10)
 
         line.set_ydata(signal)
         ax.relim()
         ax.autoscale_view(tight=False, scalex=False, scaley=True)
-        img.set_data(sipmmatrix)
 
         plt.pause(float(args.Graphics)/1000)
         txt.remove()
@@ -414,50 +395,38 @@ def initializeRandomPool():
 
 
 def SaveFile(fname, out, other=None):
-    integral = out[:, 0]
-    peak = out[:, 1]
-    tstart = out[:, 2]
-    tover = out[:, 3]
-    ptime = out[:, 4]
+    f = uproot.recreate(fname, compression=uproot.LZ4(5))
 
-    f = uproot.recreate(fname)
-    f['SiPMData'] = uproot.newtree(
-        {'Integral': 'float32',
-         'Peak': 'float32',
-         'ToA': 'float32',
-         'ToT': 'float32',
-         'ToP': 'float32'})
+    f['SiPMData'] = uproot.newtree({
+       'Integral': np.float32,
+       'Peak': np.float32,
+       'ToA': np.float32,
+       'ToT': np.float32,
+       'ToP': np.float32})
 
-    f['SiPMData']['Integral'].newbasket(integral)
-    f['SiPMData']['Peak'].newbasket(peak)
-    f['SiPMData']['ToA'].newbasket(tstart)
-    f['SiPMData']['ToP'].newbasket(ptime)
-    f['SiPMData']['ToT'].newbasket(tover)
+    f['SiPMData']['Integral'].newbasket(out[:, 0])
+    f['SiPMData']['Peak'].newbasket(out[:, 1])
+    f['SiPMData']['ToA'].newbasket(out[:, 2])
+    f['SiPMData']['ToT'].newbasket(out[:, 3])
+    f['SiPMData']['ToP'].newbasket(out[:, 4])
 
-    if other:
+    if other.any():
         other = np.array(other)
-        event = np.int32(other[:, 0])
-        fibertype = other[:, 1] == 'Scin'
-        fiberid = np.int64(other[:, 2])
-        x = np.float32(other[:, 3])
-        y = np.float32(other[:, 4])
-        z = np.float32(other[:, 5])
+        f['GeometryData'] = uproot.newtree({
+                'EventId': np.int32,
+                'FiberType': np.int8,
+                'FiberId': np.int64,
+                'FiberX': np.float32,
+                'FiberY': np.float32,
+                'FiberZ': np.float32
+                })
 
-        f['GeometryData'] = uproot.newtree(
-            {'EventId': np.int32,
-             'FiberType': np.int8,
-             'FiberId': np.int64,
-             'FiberX': np.float32,
-             'FiberY': np.float32,
-             'FiberZ': np.float32})
-
-        f['GeometryData']['EventId'].newbasket(event)
-        f['GeometryData']['FiberType'].newbasket(fibertype)
-        f['GeometryData']['FiberId'].newbasket(fiberid)
-        f['GeometryData']['FiberX'].newbasket(x)
-        f['GeometryData']['FiberY'].newbasket(y)
-        f['GeometryData']['FiberZ'].newbasket(z)
-
+        f['GeometryData']['EventId'].newbasket(np.int32(other[:, 0]))
+        f['GeometryData']['FiberType'].newbasket(np.int8(other[:, 1]))
+        f['GeometryData']['FiberId'].newbasket(np.int64(other[:, 2]))
+        f['GeometryData']['FiberX'].newbasket(np.float32(other[:, 3]))
+        f['GeometryData']['FiberY'].newbasket(np.float32(other[:, 4]))
+        f['GeometryData']['FiberZ'].newbasket(np.float32(other[:, 5]))
 
 
 def SaveWaves(fname, signals):
@@ -473,7 +442,7 @@ def SaveWaves(fname, signals):
                     DCR,
                     XT,
                     AP,
-                    CELLRECOVERY * SAMPLING,
+                    SAMPLING,
                     TRISE * SAMPLING,
                     TFALL * SAMPLING,
                     -20 * np.log10(SNR**2),
@@ -491,5 +460,6 @@ def SaveWaves(fname, signals):
                                   dtype='f',
                                   compression='gzip',
                                   compression_opts=9)
+
         dset1[...] = signals
         dset2[...] = sipmsettings

@@ -44,7 +44,7 @@ def SiPM(times, other=None):
     if dcrTime.size:
         times = hstack((times, dcrTime))
     # Update list of times and signal height
-    sigTimes, sigH, idx = SiPMEventAction(times.astype('float32'), XT)
+    sigTimes, sigH = SiPMEventAction(times.astype('float32'), XT)
 
     # Generate digital signals
     signal = SiPMSignalAction(sigTimes, sigH, SNR, BASESPREAD)
@@ -67,7 +67,7 @@ def SiPM(times, other=None):
                 dev = 'gpu(cpu)'
             else:
                 dev = 'gpu'
-        sigPlot(signal, sigTimes, dcrTime, dev, idx)
+        sigPlot(signal, sigTimes, dcrTime, dev)
     if not args.wavedump:
         signal = None
     return(integral, peak, tstart, tovert, tpeak, other, signal)
