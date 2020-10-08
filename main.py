@@ -40,23 +40,32 @@ def SiPM(times, other=None):
             Otherwise this output is None
     """
 
-    dcrTime = addDCR(DCR)  # Generate DCR events (times)
+    times = np.float32(times)
+
+    # Generate DCR events (times)
+    dcrTime = addDCR(DCR)
     if dcrTime.size:
         times = hstack((times, dcrTime))
-    # Update list of times and signal height
-    sigTimes, sigH = SiPMEventAction(times.astype('float32'), XT)
+    sortfortran(times)
+    # Calculate idx of hitted cells
+    idx = HitCells(times)
+    # Add XT events
+    times, idx = addXT(times, idx, XT)
+    # Calculate signal height of each cell
+    sigH = SiPMEventAction(times, idx)
+    times, sigH = addAP(times, sigH, AP)
 
     # Generate digital signals
-    signal = SiPMSignalAction(sigTimes, sigH, SNR, BASESPREAD)
+    signal = SiPMSignalAction(times, sigH, SNR, BASESPREAD)
 
-    # Select signal in the integration gate
+    # # Select signal in the integration gate
     signalInGate = signal[INTSTART:INTSTART + INTGATE]
-    integral, peak, tstart, tovert, tpeak = signalanalysisfortran(signalInGate, SAMPLING)
-    # integral = signalInGate.sum() * SAMPLING
-    # peak = signalInGate.max()
-    # tstart = (signalInGate > 1.5).argmax() * SAMPLING
-    # tovert = np.count_nonzero(signalInGate > 1.5) * SAMPLING
-    # tpeak = (signalInGate).argmax() * SAMPLING
+    # integral, peak, tstart, tovert, tpeak = signalanalysisfortran(signalInGate, SAMPLING)
+    integral = signalInGate.sum() * SAMPLING
+    peak = signalInGate.max()
+    tstart = (signalInGate > 1.5).argmax() * SAMPLING
+    tovert = np.count_nonzero(signalInGate > 1.5) * SAMPLING
+    tpeak = (signalInGate).argmax() * SAMPLING
     if args.Graphics:
         if not args.signal:
             dev = 'cpu-fast'
@@ -67,7 +76,7 @@ def SiPM(times, other=None):
                 dev = 'gpu(cpu)'
             else:
                 dev = 'gpu'
-        sigPlot(signal, sigTimes, dcrTime, dev)
+        sigPlot(signal, times, dcrTime, dev)
     if not args.wavedump:
         signal = None
     return(integral, peak, tstart, tovert, tpeak, other, signal)
