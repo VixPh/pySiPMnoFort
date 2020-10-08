@@ -41,11 +41,11 @@ def SiPM(times, other=None):
     """
 
     times = np.float32(times)
-
     # Generate DCR events (times)
-    dcrTime = addDCR(DCR)
-    if dcrTime.size:
-        times = hstack((times, dcrTime))
+    if not args.nodcr:
+        dcrTime = addDCR(DCR)
+        if dcrTime.size:
+            times = hstack((times, dcrTime))
     sortfortran(times)
     # Calculate idx of hitted cells
     idx = HitCells(times)

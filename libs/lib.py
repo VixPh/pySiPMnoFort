@@ -26,10 +26,9 @@ def addDCR(rate):
             Array containing dcr times
     """
     dcrTime = [0]
-    if not args.nodcr:
-        while dcrTime[-1] < SIGLEN:  # Generate from exponential distribution of delays
-            delayDCR = frandom.randexp(1/rate, 1) * 1e9
-            dcrTime.extend(dcrTime[-1] + delayDCR)
+    while dcrTime[-1] < SIGLEN:  # Generate from exponential distribution of delays
+        delayDCR = frandom.randexp(1/rate, 1) * 1e9
+        dcrTime.extend(dcrTime[-1] + delayDCR)
 
     dcrTime = np.array(dcrTime[1:-1])
     return dcrTime
