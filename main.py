@@ -51,12 +51,12 @@ def SiPM(times, other=None):
 
     # Select signal in the integration gate
     signalInGate = signal[INTSTART:INTSTART + INTGATE]
-    integral, peak, tstart, tovert, tpeak = signalanalysisfortran(signalInGate, SAMPLING)
-    # integral = signalInGate.sum() * SAMPLING
-    # peak = signalInGate.max()
-    # tstart = (signalInGate > 1.5).argmax() * SAMPLING
-    # tovert = np.count_nonzero(signalInGate > 1.5) * SAMPLING
-    # tpeak = (signalInGate).argmax() * SAMPLING
+    # integral, peak, tstart, tovert, tpeak = signalanalysisfortran(signalInGate, SAMPLING)
+    integral = signalInGate.sum() * SAMPLING
+    peak = signalInGate.max()
+    tstart = (signalInGate > 1.5).argmax() * SAMPLING
+    tovert = np.count_nonzero(signalInGate > 1.5) * SAMPLING
+    tpeak = (signalInGate).argmax() * SAMPLING
     if args.Graphics:
         if not args.signal:
             dev = 'cpu-fast'
